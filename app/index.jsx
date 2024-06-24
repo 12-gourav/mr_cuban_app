@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
   heading: {
     fontWeight: "700",
     fontFamily: "regular",
-    fontSize: "40px",
+    fontSize: 40,
     color: colors.primary,
   },
   p:{
