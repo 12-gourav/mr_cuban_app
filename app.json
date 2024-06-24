@@ -1,7 +1,8 @@
 {
   "expo": {
-    "name": "user_client",
-    "slug": "user_client",
+    "name": "mrcuban",
+    "scheme": "mrcuban",
+    "slug": "mrcuban",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -18,10 +19,23 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.gourav_bajpai1212.mrcuban"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font"
+    ],
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "fc9e2bc0-8eb2-4751-8931-eedb9e5afc84"
+      }
     }
   }
 }
