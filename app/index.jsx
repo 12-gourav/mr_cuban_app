@@ -1,6 +1,5 @@
-import {  Image, ScrollView,  StyleSheet, Text,  View } from "react-native";
+import {  Image, ScrollView,  StyleSheet, Text,  View,SafeAreaView } from "react-native";
 import React from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { colors } from "../assets/color";
 import img from "../assets/img/login.jpg";
 import AuthButton from "../components/AuthButton";
@@ -17,9 +16,9 @@ const RooyLayout = () => {
           resizeMode="cover"
         />
         <View style={styles.layer}>
-          <Text style={styles.heading}>
+            <Text style={styles.heading}>
             MR <Text style={{ color: colors.green }}>Cuban</Text>
-          </Text>
+          </Text> 
           <Text style={styles.p}>
             Welcome to MR Cuban, your ultimate destination for seamless and
             stylish car bookings. Your ride, your way – just a tap away!
@@ -40,7 +39,7 @@ const styles = StyleSheet.create({
   },
   layer: {
     position: "absolute",
-    backgroundColor: "rgba(0,0,0,0.6)",
+    backgroundColor: "rgba(0,0,0,0.5)",
     flex: 1,
     right: 0,
     top: 0,
@@ -54,15 +53,16 @@ const styles = StyleSheet.create({
     color: "#fff",
   },
   heading: {
-    fontWeight: "700",
-    fontFamily: "regular",
+
+    fontFamily: "bold",
+    fontWeight:"bold",
     fontSize: 40,
     color: colors.primary,
   },
   p:{
     color:"#fff",
     textAlign:"center",
-    fontSize:14,
+    fontSize:16,
     fontFamily:"regular",
     lineHeight:22,
     marginTop:10

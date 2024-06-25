@@ -16,7 +16,7 @@ export default AuthButton;
 const styles = StyleSheet.create({
   button: {
     backgroundColor: colors.primary,
-    padding: 10,
+    padding: 15,
     borderRadius: 5,
     marginTop: 20,
     width:"100%",
@@ -26,9 +26,9 @@ const styles = StyleSheet.create({
   },
   p1: {
     color: "#fff",
-    fontFamily: "Lato-Bold",
+    fontFamily: "regular",
+    fontWeight:"regular",
     marginTop: 0,
-    fontWeight: 500,
     padding:0
   },
 });

@@ -8,11 +8,11 @@ SplashScreen.preventAutoHideAsync();
 
 const RootLayout = () => {
 const [fontsLoaded,error] = useFonts({
-    "Lato-Black":require("../assets/fonts/Lato-Black.ttf"),
-    "Lato-Bold":require("../assets/fonts/Lato-Bold.ttf"),
+    "extra":require("../assets/fonts/Lato-Black.ttf"),
+    "bold":require("../assets/fonts/Lato-Bold.ttf"),
     "regular":require("../assets/fonts/Lato-Regular.ttf"),
-    "Lato-Light":require("../assets/fonts/Lato-Light.ttf"),
-    "Lato-Thin":require("../assets/fonts/Lato-Thin.ttf")
+    "light":require("../assets/fonts/Lato-Light.ttf"),
+    "thin":require("../assets/fonts/Lato-Thin.ttf")
 })
 
 

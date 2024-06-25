@@ -1,7 +1,5 @@
 import {
   Image,
-  Pressable,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -17,6 +15,7 @@ import AuthButton from "../../components/AuthButton";
 import lock from "../../assets/img/lock.png";
 import unlock from "../../assets/img/unlock.png";
 import { Link, router } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const SignUp = () => {
   const [show, setShow] = useState(true);
@@ -25,7 +24,6 @@ const SignUp = () => {
   const [phone,setPhone] = useState("");
   const [password, setPassword] = useState("");
 
-  console.log(show);
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={{ height: "100%" }}>
@@ -40,14 +38,14 @@ const SignUp = () => {
             <Text
               style={{
                 color: colors.primary,
-                fontFamily: "regular",
-                fontWeight: 600,
+                fontFamily: "bold",
+                fontWeight: "bold",
               }}
             >
               MR <Text  style={{
                 color: colors.green,
-                fontFamily: "regular",
-                fontWeight: 600,
+                fontFamily: "bold",
+                fontWeight: "bold",
               }}>CUBAN</Text>
             </Text>
           </Text>
@@ -58,6 +56,7 @@ const SignUp = () => {
               placeholder="Enter Your Name"
               onChangeText={(e) => setName(e)}
               value={name}
+              placeholderTextColor={"gray"}
             />
           </View>
           <View style={styles.formGroup}>
@@ -67,6 +66,7 @@ const SignUp = () => {
               placeholder="Enter Email Address"
               onChangeText={(e) => setEmail(e)}
               value={email}
+              placeholderTextColor={"gray"}
             />
           </View>
           <View style={styles.formGroup}>
@@ -76,6 +76,7 @@ const SignUp = () => {
               placeholder="Enter Phone Number"
               onChangeText={(e) => setPhone(e)}
               value={phone}
+              placeholderTextColor={"gray"}
             />
           </View>
           <View style={styles.formGroup}>
@@ -87,32 +88,33 @@ const SignUp = () => {
                 secureTextEntry={show}
                 value={password}
                 onChangeText={(e)=>setPassword(e)}
+                placeholderTextColor={"gray"}
               />
               {show ? (
                 <TouchableOpacity onPress={() => setShow(false)}>
                   <Image
-                    style={{ width: 20, height: 20, marginRight: 15 }}
+                    style={styles.lock}
                     source={lock}
                   />
                 </TouchableOpacity>
               ) : (
                 <TouchableOpacity onPress={() => setShow(true)}>
                   <Image
-                    style={{ width: 20, height: 20, marginRight: 15 }}
+                    style={styles.lock}
                     source={unlock}
                   />
                 </TouchableOpacity>
               )}
             </View>
           </View>
-          <Text style={styles.link}>
-          Already have an account?{" "}
-            <TouchableOpacity activeOpacity={0.7} onPress={()=>router.push("/sign-in")}>
-              <Text>Log In</Text>
-            </TouchableOpacity>
-          </Text>
-
-          <AuthButton title="Register" handlePress={() => router.push("/sign")} />
+          <View style={styles.footer}>
+        <Text style={styles.footerText}>   Already have an account?</Text>
+        <TouchableOpacity onPress={()=>router.push("/sign-in")}>
+          <Text style={styles.createAccountText}>Log In</Text>
+        </TouchableOpacity>
+      </View>
+      
+          <AuthButton title="Register" handlePress={() => router.push("/home")} />
         </View>
       </ScrollView>
       <StatusBar backgroundColor="#161622" style="light" />
@@ -128,7 +130,7 @@ const styles = StyleSheet.create({
   },
   layer: {
     position: "absolute",
-    backgroundColor: "rgba(0,0,0,0.6)",
+    backgroundColor: "rgba(0,0,0,0.5)",
     flex: 1,
     right: 0,
     top: 0,
@@ -142,9 +144,9 @@ const styles = StyleSheet.create({
     color: "#fff",
   },
   heading: {
-    fontWeight: "700",
-    fontFamily: "regular",
-    fontSize: "40px",
+    fontWeight: "bold",
+    fontFamily: "bold",
+    fontSize: 50,
     color: colors.primary,
   },
 
@@ -154,7 +156,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: "regular",
     marginBottom: 20,
-    fontWeight: 500,
+    fontWeight: "regular",
   },
   formGroup: {
     width: "100%",
@@ -179,24 +181,42 @@ const styles = StyleSheet.create({
   
   },
   input2: {
-    width: "100%",
+    width: "90%",
     color: "#fff",
     padding: 10,
     borderRadius: 5,
     borderColor: "transparent",
     outlineStyle: "none",
+ 
   },
   group: {
-    display: "flex",
-    gap: 5,
-    alignItems: "center",
-    flexDirection: "row",
+    width:"100%",
     backgroundColor: "rgba(0,0,0,0.5)",
     borderRadius: 5,
+    display:"flex",
+    alignItems:"center",
+    justifyContent:"space-between",
+    flexDirection:"row",
+    paddingRight:10
+ 
   },
-  link:{
-    color:"white",
-    width:"100%",
-    marginBottom:10
+  lock:{
+    width:20,
+    height:20
   }
+  ,
+  footer:{
+    display:"flex",
+    flexDirection:"row",
+    width:"100%"
+  },
+  footerText: {
+    color: '#fff',
+  display:"flex"
+  },
+  createAccountText: {
+    color: colors.primary,
+    textDecorationLine: 'none',
+    marginLeft:5
+  },
 });
