@@ -15,165 +15,167 @@ import img2 from "../../assets/img/car3.png";
 import star from "../../assets/img/star.png";
 import { colors } from "../../assets/color";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useLocalSearchParams } from "expo-router";
+import drivers from "../../constants/Driver";
 
 const search = () => {
+  const { pickup, drop, date, taxi } = useLocalSearchParams();
   return (
     <ImageBackground
       source={img}
       style={{ flex: 1, justifyContent: "center" }}
       resizeMode="cover"
     >
-      <SafeAreaView style={{ flex: 1 }}>
-     
-          <View
+      <SafeAreaView style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.5)" }}>
+        {/* <ScrollView contentContainerStyle={{ flexGrow: 1 }}> */}
+        <View style={styles.top}>
+          <View style={styles.line}>
+            <View style={styles.circle}></View>
+            <View style={styles.wrap}>
+              <Text style={styles.sm}>Pickup Location</Text>
+              <Text numberOfLines={1} ellipsizeMode="tail" style={styles.p}>
+                {pickup}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.line}>
+            <View style={styles.circle}></View>
+            <View style={styles.wrap}>
+              <Text style={styles.sm}>Drop Location</Text>
+              <Text numberOfLines={1} ellipsizeMode="tail" style={styles.p}>
+                {" "}
+                {drop}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.line}>
+            <View style={styles.circle}></View>
+            <View style={styles.wrap}>
+              <Text style={styles.sm}>Date & Time</Text>
+              <Text numberOfLines={1} ellipsizeMode="tail" style={styles.p}>
+                {date}
+              </Text>
+            </View>
+          </View>
+        </View>
+        <View style={{ width: "100%", padding: 20, paddingBottom: 10 }}>
+          <Text
             style={{
-              position: "absolute",
-              backgroundColor: "rgba(0,0,0,0.5)",
-              width: "100%",
-              height: "100%",
+              color: "#fff",
+              fontSize: 25,
+              fontWeight: 600,
+              fontFamily: "regular",
             }}
           >
-            <BlurView
-              intensity={30}
-              style={{
-                width: "100%",
-                height: 150,
-                borderBottomLeftRadius: 30,
-                borderBottomRightRadius: 30,
-                padding: 10,
-              }}
-            >
-              <View style={styles.tag}>
-                <Text style={styles.p2}>Pickup Address:</Text>
-                <Text style={styles.p1}>
-                  Near Boby Guest House Lalganj Raebraely 229206
-                </Text>
-              </View>
-              <View style={styles.tag}>
-                <Text style={styles.p2}>Drop Address:</Text>
-                <Text style={styles.p1}>
-                  Ambalika Institute of technology Mohanlalganj,Lucknow...
-                </Text>
-              </View>
-              <View style={styles.tag}>
-                <Text style={styles.p2}>Pickup Time:</Text>
-                <Text style={styles.p1}>12/04/2024 | 12:00 AM</Text>
-              </View>
-            </BlurView>
-         
-              <View style={styles.list}>
-                <Text
-                  style={{
-                    color: "#fff",
-                    fontSize: 25,
-                    fontWeight: 600,
-                    fontFamily: "regular",
-                  }}
-                >
-                  List of Rides
-                </Text>
-                <Text
-                  style={{
-                    color: "#fff",
-                    fontSize: 16,
-                    fontWeight: 400,
-                    fontFamily: "regular",
-                    marginTop: 10,
-                  }}
-                >
-                  Select your ride and negotiate with the driver for the best
-                  fare.
-                </Text>
+            List of Rides
+          </Text>
+          <Text
+            style={{
+              color: "#fff",
+              fontSize: 16,
+              fontWeight: 400,
+              fontFamily: "regular",
+              marginTop: 10,
+            }}
+          >
+            Select your ride and negotiate with the driver for the best fare.
+          </Text>
+        </View>
 
-                <View style={styles.flat}>
-                  <FlatList
-                    data={[1, 2, 3, 4, 5]}
-                    renderItem={({ item }) => (
-                      <BlurView
-                        intensity={30}
+        <View style={styles.flat}>
+          <FlatList
+            data={drivers}
+            showsHorizontalScrollIndicator={false}
+            renderItem={({ item,index }) => (
+              <BlurView
+                intensity={70}
+                style={{
+                  width: "100%",
+                  borderRadius: 10,
+                  padding: 20,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 10,
+                  marginBottom: 20,
+                  overflow: "hidden",
+                }}
+                key={item?.price+index}
+              >
+                <View
+                  style={{ display: "flex", flexDirection: "row", gap: 20 }}
+                >
+                  <View style={styles.left}>
+                    <Image
+                      resizeMode="contain"
+                      style={{ width: 100 }}
+                      source={img2}
+                    />
+                    <View
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        flexDirection: "row",
+                        gap: 10,
+                      }}
+                    >
+                      <Text
                         style={{
-                          width: "100%",
-                          borderRadius: 10,
-                          padding: 20,
-                          paddingLeft: 10,
-                          paddingRight: 10,
+                          color: "white",
                           display: "flex",
-                          flexDirection: "row",
-                          gap: 20,
-                          marginBottom: 20,
+                          alignItems: "center",
+                          gap: 2,
                         }}
                       >
-                        <View style={styles.left}>
-                          <Image
-                            resizeMode="contain"
-                            style={{ width: 100 }}
-                            source={img2}
-                          />
-                          <View
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              flexDirection: "row",
-                              gap: 10,
-                            }}
-                          >
-                            <Text
-                              style={{
-                                color: "white",
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 2,
-                              }}
-                            >
-                              4.5
-                              <Image
-                                source={star}
-                                resizeMode="contain"
-                                style={{ width: 15, height: 15 }}
-                              />{" "}
-                            </Text>
-                            <Text
-                              style={{
-                                color: "white",
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 2,
-                              }}
-                            >
-                              40+
-                              <Text style={{ color: colors.green }}>
-                                Orders
-                              </Text>
-                            </Text>
-                          </View>
-                        </View>
-                        <View style={styles.right}>
-                          <Text style={styles.h2}>Gaurav Bajpai</Text>
-                          <Text style={styles.p4}>
-                            <Text>Model Name:</Text>Vitara Brezza
-                          </Text>
-                          <Text style={styles.p3}>2500Rs</Text>
-                          <View style={styles.inputset}>
-                            <TextInput
-                              placeholder="Enter Amount"
-                              style={styles.input}
-                            />
-                            <View style={styles.btn2}>
-                              <Text style={{ color: "#fff" }}>Send</Text>
-                            </View>
-                          </View>
-                        </View>
-                      </BlurView>
-                    )}
-                    keyExtractor={(item) => item}
-                    horizontal={false}
-                    showsHorizontalScrollIndicator={false}
-                  />
+                        {item.rating}{" "}
+                        <Image
+                          source={star}
+                          resizeMode="contain"
+                          style={{ width: 15, height: 15 }}
+                        />{" "}
+                      </Text>
+                      <Text
+                        style={{
+                          color: "white",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 2,
+                        }}
+                      >
+                        {item.orders}{" "}
+                        <Text style={{ color: colors.green }}>Orders</Text>
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={styles.right}>
+                    <Text style={styles.h2}>{item.driver}</Text>
+                    <Text style={styles.p4}>
+                      <Text>
+                        Model Name:{" "}
+                        <Text style={{ color: "white" }}>{item.modelName}</Text>
+                      </Text>
+                    </Text>
+                    <Text style={styles.p3}> ₹{item.price}</Text>
+                  </View>
                 </View>
-              </View>
-       
-          </View>
-   
+                <View style={styles.inputset}>
+                  <TextInput
+                    placeholder="Enter Amount"
+                    style={styles.input}
+                    placeholderTextColor="#fff"
+                  />
+                  <View style={styles.btn2}>
+                    <Text style={{ color: "#fff" }}>Send</Text>
+                  </View>
+                </View>
+              </BlurView>
+            )}
+          
+            horizontal={false}
+            showsVerticalScrollIndicator={false}
+          />
+        </View>
+
+        {/* </ScrollView> */}
       </SafeAreaView>
     </ImageBackground>
   );
@@ -182,58 +184,75 @@ const search = () => {
 export default search;
 
 const styles = StyleSheet.create({
-  tag: {
+  top: {
     width: "100%",
+    backgroundColor: "rgba(0,0,0,0.8)",
+    padding: 20,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    height: 180,
     display: "flex",
+    alignItems: "center",
+    flexDirection: "column",
+    justifyContent: "center",
     gap: 10,
+  },
+  circle: {
+    width: 10,
+    height: 10,
+    borderWidth: 2,
+    borderColor: colors.primary,
+    borderRadius: 50,
+    marginTop: 3,
+  },
+
+  line: {
+    display: "flex",
     flexDirection: "row",
-    marginBottom: 10,
+    gap: 10,
+    alignItems: "flex-start",
+    width: "100%",
+    overflow: "hidden",
   },
-  p1: {
-    color: "#fff",
-    fontFamily: "regular",
-  },
-  p2: {
-    minWidth: 100,
-    color: "#E27E05",
-    fontWeight: "regular",
-    fontFamily: "regular",
-  },
-  list: {
-    marginTop: 10,
-    padding: 10,
-    
-  },
-  flat: {
-    marginTop: 20,
-  },
-  left: {
-    width: "fit-content",
+  wrap: {
     display: "flex",
     flexDirection: "column",
     gap: 5,
   },
-  right: {
-    width: "fit-content",
+  sm: {
+    color: "gray",
+    fontSize: 12,
+    fontWeight: "regular",
+  },
+  p: {
+    color: "#fff",
+    fontSize: 14,
+    overflow: "hidden",
+    fontWeight: "regular",
+    fontFamily: "regular",
+  },
+  flat: {
+    flex: 1,
+    padding: 20,
   },
   h2: {
     color: "#fff",
-    fontSize: 22,
-    fontFamily: "regular",
-    fontWeight: "regular",
+    fontSize: 18,
+    fontFamily: "bold",
+    fontWeight: "bold",
     marginBottom: 2,
   },
   p3: {
     color: "#fff",
     fontSize: 18,
-    fontFamily: "regular",
-    fontWeight: "regular",
+    fontFamily: "bold",
+    fontWeight: "bold",
   },
   p4: {
-    color: "#fff",
-    fontSize: 14,
-    fontFamily: "regular",
-    fontWeight: "regular",
+    color: colors.green,
+    fontSize: 12,
+    fontFamily: "bold",
+    fontWeight: "bold",
     marginBottom: 5,
   },
   inputset: {
@@ -242,26 +261,28 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginTop: 5,
+    overflow: "hidden",
   },
   input: {
-    width: 120,
+    width: "80%",
     padding: 5,
     color: "#fff",
-    marginTop: 5,
-    backgroundColor: "rgba(255,255,255,0.1)",
+    backgroundColor: "rgba(255,255,255,0.2)",
     paddingLeft: 10,
     paddingRight: 10,
-    borderRadius: 3,
+    borderRadius: 5,
     borderTopRightRadius: 0,
     borderBottomRightRadius: 0,
   },
   btn2: {
     backgroundColor: "#E27E05",
     color: "#fff",
-    width: "fit-content",
-    padding: 5,
-    marginTop: 5,
-    borderTopRightRadius: 3,
-    borderBottomRightRadius: 3,
+    padding: 9,
+    paddingLeft: 15,
+    paddingRight: 15,
+    borderTopRightRadius: 5,
+    borderBottomRightRadius: 5,
+    borderWidth: 0,
+    textAlign: "center",
   },
 });

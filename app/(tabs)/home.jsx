@@ -8,22 +8,27 @@ import {
   TouchableOpacity,
   View,
   ImageBackground,
-  Button,
+  ToastAndroid,
 } from "react-native";
 import React, { useState } from "react";
 import { colors } from "../../assets/color";
 import img from "../../assets/img/car3.png";
 import img2 from "../../assets/img/login.jpg";
-import {car} from "../../constants/Car"
+import { car } from "../../constants/Car";
 import AuthButton from "../../components/AuthButton";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
+
 const home = () => {
   const [date, setDate] = useState(new Date(1598051730000));
   const [mode, setMode] = useState("date");
   const [show, setShow] = useState(false);
+
+  const [pickup, setPickup] = useState("Near Boby Guest House Lalganj Raebraily 229206");
+  const [drop, setDrop] = useState("Near Boby Guest House Lalganj Raebraily Uttarpradesh 229206");
+  const [taxi, setTaxi] = useState("");
 
   const onChange = (event, selectedDate) => {
     const currentDate = selectedDate;
@@ -42,6 +47,27 @@ const home = () => {
 
   const showTimepicker = () => {
     showMode("time");
+  };
+
+  const handleRide = () => {
+    if (pickup === "")
+      return ToastAndroid.show(
+        "Pickup address is required",
+        ToastAndroid.SHORT
+      );
+    if (drop === "")
+      return ToastAndroid.show("Drop address is required", ToastAndroid.SHORT);
+    if (taxi === "")
+      return ToastAndroid.show("Car is required", ToastAndroid.SHORT);
+    router.push({
+      pathname: "/search",
+      params: {
+        pickup: pickup,
+        drop: drop,
+        date: date,
+        taxi: taxi,
+      },
+    });
   };
 
   return (
@@ -74,6 +100,7 @@ const home = () => {
                 style={styles.input}
                 placeholder="Enter Pickup Address"
                 placeholderTextColor={"gray"}
+                onChangeText={(e) => setPickup(e)}
               />
             </View>
             <View style={styles.group}>
@@ -82,6 +109,7 @@ const home = () => {
                 style={styles.input}
                 placeholder="Enter Drop Address"
                 placeholderTextColor={"gray"}
+                onChangeText={(e) => setDrop(e)}
               />
             </View>
             <View style={styles.group}>
@@ -91,7 +119,7 @@ const home = () => {
                 onPress={showDatepicker}
               >
                 <Text style={{ color: "gray" }}>
-                  {date === 1598051730000 ? (
+                  {date === new Date(1598051730000) ? (
                     "Select Pickup Date"
                   ) : (
                     <Text style={{ color: "#fff" }}>
@@ -125,25 +153,41 @@ const home = () => {
                 <FlatList
                   data={car}
                   renderItem={({ item }) => (
-                    <View style={styles.card}>
-                      <Image
-                        style={{ width: 100, marginBottom: 5 }}
-                        resizeMode="contain"
-                        source={img}
-                      />
-                      <Text style={styles.name}> {item?.model}</Text>
+                    <TouchableOpacity
+                      onPress={() => setTaxi(item.model)}
+                      key={item?.model}
+                    >
                       <View
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          width: "100%",
-                          flexDirection:"row"
-                        }}
+                        style={
+                          taxi === item?.model ? styles.card2 : styles.card
+                        }
                       >
-                        <Text style={styles.dis}>{item?.seat} Seater</Text>
-                        <Text style={styles.dis}>{item?.price}</Text>
+                        <Image
+                          style={{ width: 100, marginBottom: 5 }}
+                          resizeMode="contain"
+                          source={img}
+                        />
+                        <Text
+                          style={
+                            taxi === item?.model ? styles.name2 : styles.name
+                          }
+                        >
+                          {" "}
+                          {item?.model}
+                        </Text>
+                        <View
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            width: "100%",
+                            flexDirection: "row",
+                          }}
+                        >
+                          <Text style={styles.dis}>{item?.seat} Seater</Text>
+                          <Text style={styles.dis}>{item?.price}</Text>
+                        </View>
                       </View>
-                    </View>
+                    </TouchableOpacity>
                   )}
                   keyExtractor={(item) => item?.model}
                   horizontal={true}
@@ -152,10 +196,7 @@ const home = () => {
                 />
               </View>
             </View>
-            <AuthButton
-              title={"Book  Ride"}
-              handlePress={() => router.push("/search")}
-            />
+            <AuthButton title={"Book  Ride"} handlePress={() => handleRide()} />
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -221,19 +262,35 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   card: {
-    backgroundColor: "rgba(0,0,0,0.8)",
+    backgroundColor: "rgba(0,0,0,0.6)",
     width: 200,
     borderRadius: 5,
     padding: 10,
     color: "#fff",
     alignItems: "center",
+    borderWidth: 2,
   },
-  dis:{
-    color:"#fff"
+  card2: {
+    backgroundColor: "rgba(0,0,0,0.6)",
+    width: 200,
+    borderRadius: 5,
+    padding: 10,
+    color: "#fff",
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: colors.primary,
   },
-
+  dis: {
+    color: "#fff",
+  },
 
   name: {
+    width: "100%",
+    color: colors.primary,
+    fontWeight: "bold",
+    fontFamily: "bold",
+  },
+  name2: {
     width: "100%",
     color: colors.primary,
     fontWeight: "bold",
