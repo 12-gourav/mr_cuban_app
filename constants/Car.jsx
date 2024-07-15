@@ -1,9 +1,7 @@
 export const car = [
-  { model: "Breeza", seat: 7, price: "200 Rs/KM" },
-  { model: "Swift", seat: 5, price: "180 Rs/KM" },
-  { model: "Innova", seat: 8, price: "250 Rs/KM" },
-  { model: "Creta", seat: 5, price: "220 Rs/KM" },
-  { model: "Alto", seat: 4, price: "150 Rs/KM" },
-  { model: "Nano", seat: 4, price: "130 Rs/KM" },
-  { model: "Mini Cooper", seat: 2, price: "300 Rs/KM" },
+  { model: "2 Seater Car", seatCapacity: 2 },
+  { model: "4 Seater Car", seatCapacity: 4 },
+  { model: "5 Seater Car", seatCapacity: 5 },
+  { model: "7 Seater Car", seatCapacity: 7 },
+  // Add more cars as needed
 ];

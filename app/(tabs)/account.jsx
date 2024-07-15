@@ -1,19 +1,107 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import { ImageBackground, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { colors } from "../../assets/color";
+import img from "../../assets/img/login.jpg";
+import AuthButton from "../../components/AuthButton";
 
 const accout = () => {
   return (
-    <View style={{flex:1}}>
-     
-      <SafeAreaView style={{flex:1,backgroundColor:"#000",display:"flex",alignItems:"center",justifyContent:"center"}}>
-      <Text style={{color:"#fff"}}>Profile page Coming Soon!</Text>
+    <ImageBackground
+    source={img}
+    style={{ flex: 1, justifyContent: "center" }}
+    resizeMode="cover"
+  >
+   
+      <SafeAreaView style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.5)" }}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+          <View style={styles.header}>
+            <Text style={styles.h2}>Profile Page</Text>
+            <Text style={styles.p}>
+              Welcome to your profile! Here, you can manage your account
+              details, view your booking history, and update your preferences.
+            </Text>
+          </View>
+
+          <Text style={styles.h4}>Personal Details</Text>
+
+          <View style={styles.form}>
+            <Text style={styles.label}>Name</Text>
+            <TextInput style={styles.input} placeholderTextColor={"#fff"} placeholder="Enter Your Name" />
+          </View>
+          <View style={styles.form}>
+            <Text style={styles.label}>Email</Text>
+            <TextInput style={styles.input} placeholderTextColor={"#fff"} placeholder="Enter Your Email" />
+          </View>
+          <View style={styles.form}>
+            <Text style={styles.label}>Password</Text>
+            <TextInput style={styles.input} placeholderTextColor={"#fff"} placeholder="Enter Your Password" />
+          </View>
+          <View style={styles.form}>
+            <Text style={styles.label}>Phone Number</Text>
+            <TextInput style={styles.input} placeholderTextColor={"#fff"} placeholder="Enter Your Phone Number" />
+          </View>
+          <View style={{paddingLeft:20,paddingRight:20}}>
+          <AuthButton title={"Update Profile"}  />
+          </View>
+      
+
+        </ScrollView>
       </SafeAreaView>
     
-    </View>
-  )
-}
+    </ImageBackground>
+  );
+};
 
-export default accout
+export default accout;
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+  header: {
+    margin: 20,
+  },
+  h2: {
+    fontSize: 20,
+    fontWeight: "bold",
+    fontFamily: "bold",
+    color: colors.primary,
+    marginBottom: 5,
+  },
+  h4:{
+    paddingLeft:20,
+    color:"#fff",
+    fontSize: 16,
+    fontWeight: "regular",
+    fontFamily: "regular",
+    marginBottom:15
+  },
+  p: {
+    color: "#fff",
+    textAlign: "justify",
+    fontSize: 14,
+    fontWeight: "regular",
+    fontFamily: "regular",
+    lineHeight: 20,
+  },
+  form: {
+    paddingLeft: 20,
+    paddingRight: 20,
+    marginBottom:15
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: "regular",
+    fontFamily: "regular",
+    color: "#fff",
+    marginBottom:5
+  },
+  input: {
+    width: "100%",
+    padding: 10,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    borderRadius: 5,
+    color: "#fff",
+    outlineStyle: "none",
+    marginTop:5
+
+  },
+});

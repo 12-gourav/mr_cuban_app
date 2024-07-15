@@ -18,8 +18,16 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams } from "expo-router";
 import drivers from "../../constants/Driver";
 
+
 const search = () => {
-  const { pickup, drop, date, taxi } = useLocalSearchParams();
+  const { pickup, drop, date,dropDate, taxi } = useLocalSearchParams();
+
+
+
+  console.log(date,"date",dropDate,"drop")
+
+
+
   return (
     <ImageBackground
       source={img}
@@ -53,7 +61,7 @@ const search = () => {
             <View style={styles.wrap}>
               <Text style={styles.sm}>Date & Time</Text>
               <Text numberOfLines={1} ellipsizeMode="tail" style={styles.p}>
-                {date}
+                {new Date(date).toLocaleString()}
               </Text>
             </View>
           </View>
@@ -83,6 +91,7 @@ const search = () => {
         </View>
 
         <View style={styles.flat}>
+          
           <FlatList
             data={drivers}
             showsHorizontalScrollIndicator={false}

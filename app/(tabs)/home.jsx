@@ -10,7 +10,7 @@ import {
   ImageBackground,
   ToastAndroid,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { colors } from "../../assets/color";
 import img from "../../assets/img/car3.png";
 import img2 from "../../assets/img/login.jpg";
@@ -19,16 +19,26 @@ import AuthButton from "../../components/AuthButton";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import DateTimePicker from "@react-native-community/datetimepicker";
-
+import { FontAwesome } from "@expo/vector-icons";
+import { addAddress } from "../../helper";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const home = () => {
   const [date, setDate] = useState(new Date(1598051730000));
+  const [dropDate, setDropDate] = useState(new Date(1598051730000));
   const [mode, setMode] = useState("date");
+  const [mode2, setMode2] = useState("date");
   const [show, setShow] = useState(false);
+  const [show2, setShow2] = useState(false);
 
-  const [pickup, setPickup] = useState("Near Boby Guest House Lalganj Raebraily 229206");
-  const [drop, setDrop] = useState("Near Boby Guest House Lalganj Raebraily Uttarpradesh 229206");
+  const [pickup, setPickup] = useState("Near Boby Guest House lalganj");
+  const [drop, setDrop] = useState("Mohanlalganh");
   const [taxi, setTaxi] = useState("");
+  const [flag, setFlag] = useState(false);
+  const [flag2, setFlag2] = useState(false);
+  const [pickupAddressList, setPickupaddressList] = useState([]);
+  const [dropAddressList, setDropAddressList] = useState([]);
+  const [state, setState] = useState("a");
 
   const onChange = (event, selectedDate) => {
     const currentDate = selectedDate;
@@ -36,9 +46,27 @@ const home = () => {
     setDate(currentDate);
   };
 
+  const onChange2 = (event, selectedDate) => {
+    const currentDate = selectedDate;
+    setShow2(false);
+    setDropDate(currentDate);
+  };
   const showMode = (currentMode) => {
     setShow(true);
     setMode(currentMode);
+  };
+
+  const showMode2 = (currentMode) => {
+    setShow2(true);
+    setMode2(currentMode);
+  };
+
+  const showDatepicker2 = () => {
+    showMode2("date");
+  };
+
+  const showTimepicker2 = () => {
+    showMode2("time");
   };
 
   const showDatepicker = () => {
@@ -59,16 +87,41 @@ const home = () => {
       return ToastAndroid.show("Drop address is required", ToastAndroid.SHORT);
     if (taxi === "")
       return ToastAndroid.show("Car is required", ToastAndroid.SHORT);
+    addAddress("pickup", pickup);
+    addAddress("drop", drop);
     router.push({
       pathname: "/search",
       params: {
         pickup: pickup,
         drop: drop,
         date: date,
+        dropDate:dropDate,
         taxi: taxi,
       },
     });
   };
+
+  const fetchAddressLists = async () => {
+    try {
+      // Fetch pickup addresses
+      let data1 = await AsyncStorage.getItem("pickup");
+      setPickupaddressList(data1 ? JSON.parse(data1) : []);
+
+      // Fetch drop addresses
+      let data2 = await AsyncStorage.getItem("drop");
+      setDropAddressList(data2 ? JSON.parse(data2) : []);
+    } catch (error) {
+      console.error("Error fetching address lists:", error.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchAddressLists();
+  }, []);
+
+
+
+  
 
   return (
     <ImageBackground
@@ -97,11 +150,48 @@ const home = () => {
             <View style={styles.group}>
               <Text style={styles.label}>Pickup Address</Text>
               <TextInput
+                value={pickup}
                 style={styles.input}
                 placeholder="Enter Pickup Address"
                 placeholderTextColor={"gray"}
                 onChangeText={(e) => setPickup(e)}
+                onFocus={() => setFlag(true)}
+                onBlur={() =>
+                  setTimeout(() => {
+                    setFlag(false);
+                  }, 700)
+                }
               />
+              {pickupAddressList?.length > 0 &&
+                flag &&
+                pickupAddressList?.filter((f) => f?.includes(pickup))?.length >
+                  0 && (
+                  <View style={styles.autocomplete}>
+                    {pickupAddressList
+                      ?.filter((f) => f?.includes(pickup))
+                      ?.map((d) => (
+                        <View key={d}>
+                          <TouchableOpacity
+                            style={styles.auto_card}
+                            onPress={() => {
+                              setPickup(d);
+                              setFlag(false);
+                            }}
+                          >
+                            <View style={styles.tg}>
+                              <FontAwesome
+                                name="history"
+                                size={14}
+                                color="#fff"
+                                style={{ marginRight: 5 }}
+                              />
+                              <Text style={{ color: "#fff" }}>{d}</Text>
+                            </View>
+                          </TouchableOpacity>
+                        </View>
+                      ))}
+                  </View>
+                )}
             </View>
             <View style={styles.group}>
               <Text style={styles.label}>Drop Address</Text>
@@ -110,41 +200,137 @@ const home = () => {
                 placeholder="Enter Drop Address"
                 placeholderTextColor={"gray"}
                 onChangeText={(e) => setDrop(e)}
+                onFocus={() => setFlag2(true)}
+                value={drop}
+                onBlur={() =>
+                  setTimeout(() => {
+                    setFlag2(false);
+                  }, 700)
+                }
               />
+              {dropAddressList?.length > 0 &&
+                flag2 &&
+                dropAddressList?.filter((f) => f?.includes(drop))?.length >
+                  0 && (
+                  <View style={styles.autocomplete}>
+                    {dropAddressList
+                      ?.filter((f) => f?.includes(drop))
+                      ?.map((d) => (
+                        <View key={d}>
+                          <TouchableOpacity
+                            style={styles.auto_card}
+                            onPress={() => {
+                              setDrop(d);
+                              setFlag2(false);
+                              setFlag(false);
+                            }}
+                          >
+                            <View style={styles.tg}>
+                              <FontAwesome
+                                name="history"
+                                size={14}
+                                color="#fff"
+                                style={{ marginRight: 5 }}
+                              />
+                              <Text style={{ color: "#fff" }}>{d}</Text>
+                            </View>
+                          </TouchableOpacity>
+                        </View>
+                      ))}
+                  </View>
+                )}
             </View>
-            <View style={styles.group}>
-              <Text style={styles.label}>Pickup Date</Text>
-              <TouchableOpacity
-                style={styles.inputBtn}
-                onPress={showDatepicker}
-              >
-                <Text style={{ color: "gray" }}>
-                  {date === new Date(1598051730000) ? (
-                    "Select Pickup Date"
-                  ) : (
-                    <Text style={{ color: "#fff" }}>
-                      {date?.toLocaleDateString()}
+
+            <View>
+              <View style={styles.tabs}>
+                <TouchableOpacity
+                  onPress={() => setState("a")}
+                  style={state === "a" ? styles.active : styles.tab1}
+                >
+                  <Text style={styles.tab_p}>One Way Trip</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => setState("b")}
+                  style={state === "b" ? styles.active : styles.tab1}
+                >
+                  <Text style={styles.tab_p}>Round Trip</Text>
+                </TouchableOpacity>
+              </View>
+              {state === "a" ? (
+                <View style={styles.wrapper}>
+                  <View style={styles.groupz}>
+                    <Text style={styles.label}>Pickup Date</Text>
+                    <TouchableOpacity
+                      style={styles.inputBtn}
+                      onPress={showDatepicker}
+                    >
+                      <Text style={{ color: "gray" }}>
+                        {date === new Date(1598051730000) ? (
+                          "Select Pickup Date"
+                        ) : (
+                          <Text style={{ color: "#fff" }}>
+                            {date?.toLocaleDateString()}
+                          </Text>
+                        )}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.groupz}>
+                    <Text style={styles.label}>Pickup Time</Text>
+                    <TouchableOpacity
+                      style={styles.inputBtn}
+                      onPress={showTimepicker}
+                    >
+                      <Text style={{ color: "gray" }}>
+                        {date === 1598051730000 ? (
+                          "Select Pickup Time"
+                        ) : (
+                          <Text style={{ color: "#fff" }}>
+                            {date?.toLocaleTimeString()}
+                          </Text>
+                        )}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ) : (
+                <View style={styles.wrapper}>
+                <View style={styles.groupz}>
+                  <Text style={styles.label}>Drop Date</Text>
+                  <TouchableOpacity
+                    style={styles.inputBtn}
+                    onPress={showDatepicker2}
+                  >
+                    <Text style={{ color: "gray" }}>
+                      {dropDate === new Date(1598051730000) ? (
+                        "Select Pickup Date"
+                      ) : (
+                        <Text style={{ color: "#fff" }}>
+                          {dropDate?.toLocaleDateString()}
+                        </Text>
+                      )}
                     </Text>
-                  )}
-                </Text>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.group}>
-              <Text style={styles.label}>Pickup Time</Text>
-              <TouchableOpacity
-                style={styles.inputBtn}
-                onPress={showTimepicker}
-              >
-                <Text style={{ color: "gray" }}>
-                  {date === 1598051730000 ? (
-                    "Select Pickup Time"
-                  ) : (
-                    <Text style={{ color: "#fff" }}>
-                      {date?.toLocaleTimeString()}
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.groupz}>
+                  <Text style={styles.label}>Drop Time</Text>
+                  <TouchableOpacity
+                    style={styles.inputBtn}
+                    onPress={showTimepicker2}
+                  >
+                    <Text style={{ color: "gray" }}>
+                      {dropDate === 1598051730000 ? (
+                        "Select Pickup Time"
+                      ) : (
+                        <Text style={{ color: "#fff" }}>
+                          {dropDate?.toLocaleTimeString()}
+                        </Text>
+                      )}
                     </Text>
-                  )}
-                </Text>
-              </TouchableOpacity>
+                  </TouchableOpacity>
+                </View>
+              </View>
+              )}
             </View>
 
             <View style={styles.group}>
@@ -175,17 +361,6 @@ const home = () => {
                           {" "}
                           {item?.model}
                         </Text>
-                        <View
-                          style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            width: "100%",
-                            flexDirection: "row",
-                          }}
-                        >
-                          <Text style={styles.dis}>{item?.seat} Seater</Text>
-                          <Text style={styles.dis}>{item?.price}</Text>
-                        </View>
                       </View>
                     </TouchableOpacity>
                   )}
@@ -207,6 +382,15 @@ const home = () => {
           mode={mode}
           is24Hour={true}
           onChange={onChange}
+        />
+      )}
+       {show2 && (
+        <DateTimePicker
+          testID="dateTimePicker"
+          value={dropDate}
+          mode={mode2}
+          is24Hour={true}
+          onChange={onChange2}
         />
       )}
     </ImageBackground>
@@ -236,6 +420,28 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     gap: 8,
     marginBottom: 25,
+    position: "relative",
+  },
+  autocomplete: {
+    position: "absolute",
+    width: "100%",
+    height: "fit-content",
+    backgroundColor: "rgba(0,0,0,0.8)",
+    zIndex: 999,
+    top: 75,
+    borderRadius: 5,
+    padding: 10,
+  },
+  auto_card: {
+    width: "100%",
+    padding: 10,
+  },
+  tg: {
+    color: "#fff",
+    display: "flex",
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 5,
   },
   label: {
     color: "#fff",
@@ -317,5 +523,49 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     color: "#fff",
+  },
+  wrapper: {
+    width: "100%",
+    display: "flex",
+    flexDirection: "row",
+    gap: 10,
+    marginTop: 20,
+    marginBottom:10
+  },
+  groupz: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 8,
+    marginBottom: 25,
+    position: "relative",
+    width: "50%",
+  },
+  tabs: {
+    width: "100%",
+    display: "flex",
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 10,
+  },
+  active: {
+    backgroundColor: colors.primary,
+    padding: 10,
+    borderRadius: 5,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  tab1: {
+    backgroundColor: "rgba(0,0,0,0.8)",
+    padding: 10,
+    borderRadius: 5,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  tab_p: {
+    color: "#fff",
+    fontWeight: "regular",
+    fontFamily: "regular",
   },
 });
