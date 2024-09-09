@@ -1,12 +1,45 @@
 import {  Image, ScrollView,  StyleSheet, Text,  View,SafeAreaView } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import { colors } from "../assets/color";
 import img from "../assets/img/login.jpg";
 import AuthButton from "../components/AuthButton";
 import {router} from "expo-router";
 import { StatusBar } from 'expo-status-bar'
+import { LoadApi } from "../api/auth";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useDispatch } from "react-redux";
 
 const RooyLayout = () => {
+
+const dispatch = useDispatch()
+  
+
+
+  const fetchUserDetails = async ()=>{
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const result = await LoadApi(token);
+      console.log(result?.data)
+      if(result?.data?.data){
+        dispatch({ type: "login", payload: result?.data?.data });
+        router.replace("/home");
+      }
+      
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+
+  useEffect(()=>{
+    fetchUserDetails()
+  },[])
+
+
+
+
+
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={{ height: "100%" }}>

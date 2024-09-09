@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import { colors } from "../../assets/color";
 import img from "../../assets/img/login.jpg";
@@ -18,14 +18,17 @@ import unlock from "../../assets/img/unlock.png";
 import { Link, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LoginApi } from "../../api/auth";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const SignIn = () => {
+  const {isValid} = useSelector((state)=>state.user);
   const [show, setShow] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
+  
 
   const handleLogin = async () => {
     try {
@@ -52,20 +55,41 @@ const SignIn = () => {
       }
       setLoading(true);
       const result = await LoginApi(email, password);
-    
+    console.log(result?.data?.data)
       if (result?.data?.data) {
-        localStorage.setItem("token", result?.data?.token);
+        await AsyncStorage.setItem("token", result?.data?.token);
         dispatch({ type: "login", payload: result?.data?.data });
-        router.push("/home");
+        router.replace("/home");
+        ToastAndroid.show("Login Successfull", ToastAndroid.SHORT);
       } else {
         ToastAndroid.show("Login Failed", ToastAndroid.SHORT);
       }
     } catch (error) {
       console.log(error);
+      ToastAndroid.show(error?.response?.data?.msg, ToastAndroid.SHORT);
     } finally {
       setLoading(false);
     }
   };
+
+
+
+  useEffect(()=>{
+    if(isValid){
+      router.replace("/home")
+    }
+  },[isValid])
+
+
+
+
+
+console.log(isValid,"ssss")
+
+
+
+
+
 
   return (
     <SafeAreaView style={{ flex: 1 }}>

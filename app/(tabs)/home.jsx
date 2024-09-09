@@ -22,6 +22,8 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { FontAwesome } from "@expo/vector-icons";
 import { addAddress } from "../../helper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useDispatch } from "react-redux";
+
 
 const home = () => {
   const [date, setDate] = useState(new Date(1598051730000));
@@ -39,6 +41,7 @@ const home = () => {
   const [pickupAddressList, setPickupaddressList] = useState([]);
   const [dropAddressList, setDropAddressList] = useState([]);
   const [state, setState] = useState("a");
+  const dispatch = useDispatch()
 
   const onChange = (event, selectedDate) => {
     const currentDate = selectedDate;
@@ -121,6 +124,13 @@ const home = () => {
   }, []);
 
 
+  const handleLogout = async()=>{
+    AsyncStorage.removeItem("token");
+    dispatch({type:"logout",payload:""})
+    router.push("/")
+  }
+
+
 
   
 
@@ -130,7 +140,8 @@ const home = () => {
       resizeMode="cover"
       style={{ flex: 1, justifyContent: "center" }}
     >
-      <SafeAreaView style={{ flex: 1 }}>
+
+          <SafeAreaView style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.5)" }}>
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
           <View style={styles.wrap}>
             <TouchableOpacity onPress={() => router.push("/")}>
@@ -373,6 +384,7 @@ const home = () => {
               </View>
             </View>
             <AuthButton title={"Book  Ride"} handlePress={() => handleRide()} />
+            <AuthButton title={"Logout"} handlePress={() => handleLogout()} />
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -406,7 +418,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     flex: 1,
     padding: 20,
-    backgroundColor: "rgba(0,0,0,0.5)",
+    // backgroundColor: "rgba(0,0,0,0.5)",
   },
   h2: {
     color: colors.primary,

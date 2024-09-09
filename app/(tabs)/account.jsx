@@ -4,8 +4,14 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { colors } from "../../assets/color";
 import img from "../../assets/img/login.jpg";
 import AuthButton from "../../components/AuthButton";
+import {useSelector} from "react-redux";
 
 const accout = () => {
+
+  const {user} = useSelector((state)=>state.user)
+
+
+
   return (
     <ImageBackground
     source={img}
@@ -27,20 +33,20 @@ const accout = () => {
 
           <View style={styles.form}>
             <Text style={styles.label}>Name</Text>
-            <TextInput style={styles.input} placeholderTextColor={"#fff"} placeholder="Enter Your Name" />
+            <TextInput style={styles.input} placeholderTextColor={"#fff"} value={user?.name} placeholder="Enter Your Name" />
           </View>
           <View style={styles.form}>
             <Text style={styles.label}>Email</Text>
-            <TextInput style={styles.input} placeholderTextColor={"#fff"} placeholder="Enter Your Email" />
+            <TextInput style={styles.input} placeholderTextColor={"#fff"} value={user?.email} placeholder="Enter Your Email" />
           </View>
           <View style={styles.form}>
             <Text style={styles.label}>Password</Text>
-            <TextInput style={styles.input} placeholderTextColor={"#fff"} placeholder="Enter Your Password" />
+            <TextInput style={styles.input} placeholderTextColor={"#fff"} value={user?.password} placeholder="Enter Your Password" />
           </View>
           <View style={styles.form}>
             <Text style={styles.label}>Phone Number</Text>
-            <TextInput style={styles.input} placeholderTextColor={"#fff"} placeholder="Enter Your Phone Number" />
-          </View>
+            <TextInput style={styles.input} placeholderTextColor={"#fff"} value={user?.phone} placeholder="Enter Your Phone Number" />
+          </View> 
           <View style={{paddingLeft:20,paddingRight:20}}>
           <AuthButton title={"Update Profile"}  />
           </View>

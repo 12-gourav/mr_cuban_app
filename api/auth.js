@@ -32,7 +32,7 @@ export const RegisterApi = async (name, email, phone, password) => {
 
 export const LoadApi = async (token) => {
   try {
-    return await axios.get(`${url}/api/v1/load/user`, {
+    return await axios.get(`${url}/load/user`, {
       headers: {
         token,
       },
