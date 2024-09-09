@@ -20,7 +20,7 @@ import drivers from "../../constants/Driver";
 
 
 const search = () => {
-  const { pickup, drop, date,dropDate, taxi } = useLocalSearchParams();
+  const { pickup, drop, date,dropDate, taxi,way } = useLocalSearchParams();
 
 
 
@@ -59,12 +59,24 @@ const search = () => {
           <View style={styles.line}>
             <View style={styles.circle}></View>
             <View style={styles.wrap}>
-              <Text style={styles.sm}>Date & Time</Text>
+              <Text style={styles.sm}>Pickup Date & Time</Text>
               <Text numberOfLines={1} ellipsizeMode="tail" style={styles.p}>
                 {new Date(date).toLocaleString()}
               </Text>
             </View>
           </View>
+          {
+            way==="b" &&      <View style={styles.line}>
+            <View style={styles.circle}></View>
+            <View style={styles.wrap}>
+              <Text style={styles.sm}>Return Date & Time</Text>
+              <Text numberOfLines={1} ellipsizeMode="tail" style={styles.p}>
+                {new Date(date).toLocaleString()}
+              </Text>
+            </View>
+          </View>
+          }
+     
         </View>
         <View style={{ width: "100%", padding: 20, paddingBottom: 10 }}>
           <Text
@@ -171,6 +183,8 @@ const search = () => {
                     placeholder="Enter Amount"
                     style={styles.input}
                     placeholderTextColor="#fff"
+                    keyboardType="numeric"
+                    maxLength={10} 
                   />
                   <View style={styles.btn2}>
                     <Text style={{ color: "#fff" }}>Send</Text>
@@ -199,7 +213,7 @@ const styles = StyleSheet.create({
     padding: 20,
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
-    height: 180,
+    height: "fit-content",
     display: "flex",
     alignItems: "center",
     flexDirection: "column",

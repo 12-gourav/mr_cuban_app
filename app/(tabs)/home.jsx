@@ -97,6 +97,7 @@ const home = () => {
         date: date,
         dropDate:dropDate,
         taxi: taxi,
+        way:state
       },
     });
   };

@@ -4,6 +4,7 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  ToastAndroid,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -16,83 +17,126 @@ import lock from "../../assets/img/lock.png";
 import unlock from "../../assets/img/unlock.png";
 import { Link, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { LoginApi } from "../../api/auth";
+import { useDispatch } from "react-redux";
 
 const SignIn = () => {
   const [show, setShow] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
 
-  console.log(show);
+  const handleLogin = async () => {
+    try {
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (email === "") {
+        return ToastAndroid.show("Email is required", ToastAndroid.SHORT);
+      }
+
+      if (!emailPattern.test(email)) {
+        return ToastAndroid.show("Invalid email address", ToastAndroid.SHORT);
+      }
+
+      if (password === "") {
+        return ToastAndroid.show("Password is required", ToastAndroid.SHORT);
+      }
+
+      if (password?.length < 6) {
+        return ToastAndroid.show("Password is too short", ToastAndroid.SHORT);
+      }
+
+      if (password?.length > 16) {
+        return ToastAndroid.show("Password is too long", ToastAndroid.SHORT);
+      }
+      setLoading(true);
+      const result = await LoginApi(email, password);
+    
+      if (result?.data?.data) {
+        localStorage.setItem("token", result?.data?.token);
+        dispatch({ type: "login", payload: result?.data?.data });
+        router.push("/home");
+      } else {
+        ToastAndroid.show("Login Failed", ToastAndroid.SHORT);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
-        <Image
-          source={img}
-          style={{ flex: 1, position: "relative" }}
-          resizeMode="cover"
-        />
-        <View style={styles.layer}>
-          <Text style={styles.p2}>
-            Log in to{" "}
+      <Image
+        source={img}
+        style={{ flex: 1, position: "relative" }}
+        resizeMode="cover"
+      />
+      <View style={styles.layer}>
+        <Text style={styles.p2}>
+          Log in to{" "}
+          <Text
+            style={{
+              color: colors.primary,
+              fontFamily: "bold",
+              fontWeight: "bold",
+            }}
+          >
+            MR{" "}
             <Text
               style={{
-                color: colors.primary,
+                color: colors.green,
                 fontFamily: "bold",
                 fontWeight: "bold",
               }}
             >
-              MR <Text  style={{
-                color: colors.green,
-                fontFamily: "bold",
-                fontWeight: "bold",
-              }}>CUBAN</Text>
+              CUBAN
             </Text>
           </Text>
-          <View style={styles.formGroup}>
-            <Text style={styles.label}>Email</Text>
+        </Text>
+        <View style={styles.formGroup}>
+          <Text style={styles.label}>Email</Text>
+          <TextInput
+            style={[styles.input1]}
+            placeholder="Enter Email Address"
+            onChangeText={(e) => setEmail(e)}
+            placeholderTextColor={"gray"}
+          />
+        </View>
+        <View style={styles.formGroup}>
+          <Text style={styles.label}>Password</Text>
+          <View style={styles.group}>
             <TextInput
-              style={[styles.input1]}
-              placeholder="Enter Email Address"
-              onChangeText={(e) => setEmail(e)}
+              style={styles.input2}
+              placeholder="Enter Password"
+              secureTextEntry={show}
               placeholderTextColor={"gray"}
+              onChangeText={(e) => setPassword(e)}
             />
+            {show ? (
+              <TouchableOpacity onPress={() => setShow(false)}>
+                <Image style={styles.lock} source={lock} />
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity onPress={() => setShow(true)}>
+                <Image style={styles.lock} source={unlock} />
+              </TouchableOpacity>
+            )}
           </View>
-          <View style={styles.formGroup}>
-            <Text style={styles.label}>Password</Text>
-            <View style={styles.group}>
-              <TextInput
-                style={styles.input2}
-                placeholder="Enter Password"
-                secureTextEntry={show}
-                placeholderTextColor={"gray"}
-              />
-              {show ? (
-                <TouchableOpacity onPress={() => setShow(false)}>
-                  <Image
-                    style={styles.lock}
-                    source={lock}
-                  />
-                </TouchableOpacity>
-              ) : (
-                <TouchableOpacity onPress={() => setShow(true)}>
-                  <Image
-                      style={styles.lock}
-                    source={unlock}
-                  />
-                </TouchableOpacity>
-              )}
-            </View>
-          </View>
-    
-          <View style={styles.footer}>
-        <Text style={styles.footerText}>Don't have an account?</Text>
-        <TouchableOpacity onPress={()=>router.push("/sign-up")}>
-          <Text style={styles.createAccountText}>Create new account</Text>
-        </TouchableOpacity>
+        </View>
+
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>Don't have an account?</Text>
+          <TouchableOpacity onPress={() => router.push("/sign-up")}>
+            <Text style={styles.createAccountText}>Create new account</Text>
+          </TouchableOpacity>
+        </View>
+
+        <AuthButton title="Login" handlePress={() => handleLogin()} />
       </View>
 
-          <AuthButton title="Login" handlePress={() => router.push("/home")} />
-        </View>
- 
       <StatusBar backgroundColor="#161622" style="light" />
     </SafeAreaView>
   );
@@ -162,36 +206,33 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderColor: "transparent",
     outlineStyle: "none",
- 
   },
   group: {
-    width:"100%",
+    width: "100%",
     backgroundColor: "rgba(0,0,0,0.5)",
     borderRadius: 5,
-    display:"flex",
-    alignItems:"center",
-    justifyContent:"space-between",
-    flexDirection:"row",
-    paddingRight:10
- 
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    flexDirection: "row",
+    paddingRight: 10,
   },
-  lock:{
-    width:20,
-    height:20
-  }
-  ,
-  footer:{
-    display:"flex",
-    flexDirection:"row",
-    width:"100%"
+  lock: {
+    width: 20,
+    height: 20,
+  },
+  footer: {
+    display: "flex",
+    flexDirection: "row",
+    width: "100%",
   },
   footerText: {
-    color: '#fff',
-  display:"flex"
+    color: "#fff",
+    display: "flex",
   },
   createAccountText: {
     color: colors.primary,
-    textDecorationLine: 'none',
-    marginLeft:5
+    textDecorationLine: "none",
+    marginLeft: 5,
   },
 });

@@ -2,11 +2,11 @@ import { Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-nativ
 import React from "react";
 import { colors } from "../assets/color";
 
-const AuthButton = ({ title,handlePress }) => {
+const AuthButton = ({ title,handlePress,loading }) => {
     
   return (
-    <TouchableOpacity style={styles.button} onPress={handlePress} activeOpacity={0.7}>
-      <Text style={styles.p1}>{title}</Text>
+    <TouchableOpacity style={styles.button} onPress={handlePress} activeOpacity={0.7} disabled={loading||false}>
+      {loading ? <Text>Loading</Text>:<Text style={styles.p1}>{title}</Text>}
     </TouchableOpacity>
   );
 };

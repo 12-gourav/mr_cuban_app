@@ -4,6 +4,7 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  ToastAndroid,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -16,13 +17,58 @@ import lock from "../../assets/img/lock.png";
 import unlock from "../../assets/img/unlock.png";
 import { Link, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { RegisterApi } from "../../api/auth";
+import { useDispatch } from "react-redux";
 
 const SignUp = () => {
   const [show, setShow] = useState(true);
-  const [name,setName] = useState("")
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [phone,setPhone] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
+
+  const handleRegister = async () => {
+    try {
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const mobilePattern = /^[0-9]{10}$/;
+      if (name === "")
+        return ToastAndroid.show("Name is Required", ToastAndroid.SHORT);
+      if (email === "")
+        return ToastAndroid.show("Email is Required", ToastAndroid.SHORT);
+      if (!emailPattern.test(email)) {
+        return ToastAndroid.show("Invalid email address", ToastAndroid.SHORT);
+      }
+      if (phone === "")
+        return ToastAndroid.show("Phone is Required", ToastAndroid.SHORT);
+      if (!mobilePattern.test(phone)) {
+        return ToastAndroid.show("Invalid mobile number", ToastAndroid.SHORT);
+      }
+      if (password === "")
+        return ToastAndroid.show("Password is Required", ToastAndroid.SHORT);
+      if (password?.length < 6) {
+        return ToastAndroid.show("Password is too short", ToastAndroid.SHORT);
+      }
+      if (password?.length > 16) {
+        return ToastAndroid.show("Password is too long", ToastAndroid.SHORT);
+      }
+      setLoading(true);
+      const result = await RegisterApi(name, email, phone, password);
+      if (result?.data?.data) {
+        localStorage.setItem("token", result?.data?.token);
+        dispatch({ type: "login", payload: result?.data?.data });
+        ToastAndroid.show("Registration Successfull", ToastAndroid.SHORT);
+        router.push("/home")
+      } else {
+        ToastAndroid.show("Registration Failed", ToastAndroid.SHORT);
+      }
+    } catch (error) {
+      console.log(error,"oooo");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -42,11 +88,16 @@ const SignUp = () => {
                 fontWeight: "bold",
               }}
             >
-              MR <Text  style={{
-                color: colors.green,
-                fontFamily: "bold",
-                fontWeight: "bold",
-              }}>CUBAN</Text>
+              MR{" "}
+              <Text
+                style={{
+                  color: colors.green,
+                  fontFamily: "bold",
+                  fontWeight: "bold",
+                }}
+              >
+                CUBAN
+              </Text>
             </Text>
           </Text>
           <View style={styles.formGroup}>
@@ -87,34 +138,33 @@ const SignUp = () => {
                 placeholder="Enter Password"
                 secureTextEntry={show}
                 value={password}
-                onChangeText={(e)=>setPassword(e)}
+                onChangeText={(e) => setPassword(e)}
                 placeholderTextColor={"gray"}
               />
               {show ? (
                 <TouchableOpacity onPress={() => setShow(false)}>
-                  <Image
-                    style={styles.lock}
-                    source={lock}
-                  />
+                  <Image style={styles.lock} source={lock} />
                 </TouchableOpacity>
               ) : (
                 <TouchableOpacity onPress={() => setShow(true)}>
-                  <Image
-                    style={styles.lock}
-                    source={unlock}
-                  />
+                  <Image style={styles.lock} source={unlock} />
                 </TouchableOpacity>
               )}
             </View>
           </View>
           <View style={styles.footer}>
-        <Text style={styles.footerText}>   Already have an account?</Text>
-        <TouchableOpacity onPress={()=>router.push("/sign-in")}>
-          <Text style={styles.createAccountText}>Log In</Text>
-        </TouchableOpacity>
-      </View>
-      
-          <AuthButton title="Register" handlePress={() => router.push("/home")} />
+            <Text style={styles.footerText}> Already have an account?</Text>
+            <TouchableOpacity onPress={() => router.push("/sign-in")}>
+              <Text style={styles.createAccountText}>Log In</Text>
+            </TouchableOpacity>
+          </View>
+
+          <AuthButton
+            title="Register"
+            handlePress={() => handleRegister()}
+            loading={loading}
+            
+          />
         </View>
       </ScrollView>
       <StatusBar backgroundColor="#161622" style="light" />
@@ -178,7 +228,6 @@ const styles = StyleSheet.create({
     borderColor: "transparent",
     outlineStyle: "none",
     backgroundColor: "rgba(0,0,0,0.5)",
-  
   },
   input2: {
     width: "90%",
@@ -187,36 +236,33 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderColor: "transparent",
     outlineStyle: "none",
- 
   },
   group: {
-    width:"100%",
+    width: "100%",
     backgroundColor: "rgba(0,0,0,0.5)",
     borderRadius: 5,
-    display:"flex",
-    alignItems:"center",
-    justifyContent:"space-between",
-    flexDirection:"row",
-    paddingRight:10
- 
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    flexDirection: "row",
+    paddingRight: 10,
   },
-  lock:{
-    width:20,
-    height:20
-  }
-  ,
-  footer:{
-    display:"flex",
-    flexDirection:"row",
-    width:"100%"
+  lock: {
+    width: 20,
+    height: 20,
+  },
+  footer: {
+    display: "flex",
+    flexDirection: "row",
+    width: "100%",
   },
   footerText: {
-    color: '#fff',
-  display:"flex"
+    color: "#fff",
+    display: "flex",
   },
   createAccountText: {
     color: colors.primary,
-    textDecorationLine: 'none',
-    marginLeft:5
+    textDecorationLine: "none",
+    marginLeft: 5,
   },
 });
