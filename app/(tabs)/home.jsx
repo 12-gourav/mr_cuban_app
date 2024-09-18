@@ -19,11 +19,9 @@ import AuthButton from "../../components/AuthButton";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { FontAwesome } from "@expo/vector-icons";
 import { addAddress } from "../../helper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch } from "react-redux";
-
 
 const home = () => {
   const [date, setDate] = useState(new Date(1598051730000));
@@ -35,13 +33,17 @@ const home = () => {
 
   const [pickup, setPickup] = useState("Near Boby Guest House lalganj");
   const [drop, setDrop] = useState("Mohanlalganh");
+  const [returnPickup, setReturnPickup] = useState(
+    "Near Boby Guest House lalganj"
+  );
+  const [returnDrop, setReturnDrop] = useState("Mohanlalganh");
   const [taxi, setTaxi] = useState("");
   const [flag, setFlag] = useState(false);
   const [flag2, setFlag2] = useState(false);
   const [pickupAddressList, setPickupaddressList] = useState([]);
   const [dropAddressList, setDropAddressList] = useState([]);
   const [state, setState] = useState("a");
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const onChange = (event, selectedDate) => {
     const currentDate = selectedDate;
@@ -98,9 +100,11 @@ const home = () => {
         pickup: pickup,
         drop: drop,
         date: date,
-        dropDate:dropDate,
+        dropDate: dropDate,
         taxi: taxi,
-        way:state
+        way: state,
+        returnPickup:returnPickup,
+        returnDrop:returnDrop
       },
     });
   };
@@ -123,16 +127,11 @@ const home = () => {
     fetchAddressLists();
   }, []);
 
-
-  const handleLogout = async()=>{
+  const handleLogout = async () => {
     AsyncStorage.removeItem("token");
-    dispatch({type:"logout",payload:""})
-    router.push("/")
-  }
-
-
-
-  
+    dispatch({ type: "logout", payload: "" });
+    router.push("/");
+  };
 
   return (
     <ImageBackground
@@ -140,8 +139,7 @@ const home = () => {
       resizeMode="cover"
       style={{ flex: 1, justifyContent: "center" }}
     >
-
-          <SafeAreaView style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.5)" }}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.5)" }}>
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
           <View style={styles.wrap}>
             <TouchableOpacity onPress={() => router.push("/")}>
@@ -159,100 +157,6 @@ const home = () => {
               </Text>
             </TouchableOpacity>
 
-            <View style={styles.group}>
-              <Text style={styles.label}>Pickup Address</Text>
-              <TextInput
-                value={pickup}
-                style={styles.input}
-                placeholder="Enter Pickup Address"
-                placeholderTextColor={"gray"}
-                onChangeText={(e) => setPickup(e)}
-                onFocus={() => setFlag(true)}
-                onBlur={() =>
-                  setTimeout(() => {
-                    setFlag(false);
-                  }, 700)
-                }
-              />
-              {pickupAddressList?.length > 0 &&
-                flag &&
-                pickupAddressList?.filter((f) => f?.includes(pickup))?.length >
-                  0 && (
-                  <View style={styles.autocomplete}>
-                    {pickupAddressList
-                      ?.filter((f) => f?.includes(pickup))
-                      ?.map((d) => (
-                        <View key={d}>
-                          <TouchableOpacity
-                            style={styles.auto_card}
-                            onPress={() => {
-                              setPickup(d);
-                              setFlag(false);
-                            }}
-                          >
-                            <View style={styles.tg}>
-                              <FontAwesome
-                                name="history"
-                                size={14}
-                                color="#fff"
-                                style={{ marginRight: 5 }}
-                              />
-                              <Text style={{ color: "#fff" }}>{d}</Text>
-                            </View>
-                          </TouchableOpacity>
-                        </View>
-                      ))}
-                  </View>
-                )}
-            </View>
-            <View style={styles.group}>
-              <Text style={styles.label}>Drop Address</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Enter Drop Address"
-                placeholderTextColor={"gray"}
-                onChangeText={(e) => setDrop(e)}
-                onFocus={() => setFlag2(true)}
-                value={drop}
-                onBlur={() =>
-                  setTimeout(() => {
-                    setFlag2(false);
-                  }, 700)
-                }
-              />
-              {dropAddressList?.length > 0 &&
-                flag2 &&
-                dropAddressList?.filter((f) => f?.includes(drop))?.length >
-                  0 && (
-                  <View style={styles.autocomplete}>
-                    {dropAddressList
-                      ?.filter((f) => f?.includes(drop))
-                      ?.map((d) => (
-                        <View key={d}>
-                          <TouchableOpacity
-                            style={styles.auto_card}
-                            onPress={() => {
-                              setDrop(d);
-                              setFlag2(false);
-                              setFlag(false);
-                            }}
-                          >
-                            <View style={styles.tg}>
-                              <FontAwesome
-                                name="history"
-                                size={14}
-                                color="#fff"
-                                style={{ marginRight: 5 }}
-                              />
-                              <Text style={{ color: "#fff" }}>{d}</Text>
-                            </View>
-                          </TouchableOpacity>
-                        </View>
-                      ))}
-                  </View>
-                )}
-            </View>
-
             <View>
               <View style={styles.tabs}>
                 <TouchableOpacity
@@ -268,82 +172,129 @@ const home = () => {
                   <Text style={styles.tab_p}>Round Trip</Text>
                 </TouchableOpacity>
               </View>
-              {state === "a" ? (
-                <View style={styles.wrapper}>
-                  <View style={styles.groupz}>
-                    <Text style={styles.label}>Pickup Date</Text>
-                    <TouchableOpacity
-                      style={styles.inputBtn}
-                      onPress={showDatepicker}
-                    >
-                      <Text style={{ color: "gray" }}>
-                        {date === new Date(1598051730000) ? (
-                          "Select Pickup Date"
-                        ) : (
-                          <Text style={{ color: "#fff" }}>
-                            {date?.toLocaleDateString()}
-                          </Text>
-                        )}
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                  <View style={styles.groupz}>
-                    <Text style={styles.label}>Pickup Time</Text>
-                    <TouchableOpacity
-                      style={styles.inputBtn}
-                      onPress={showTimepicker}
-                    >
-                      <Text style={{ color: "gray" }}>
-                        {date === 1598051730000 ? (
-                          "Select Pickup Time"
-                        ) : (
-                          <Text style={{ color: "#fff" }}>
-                            {date?.toLocaleTimeString()}
-                          </Text>
-                        )}
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              ) : (
-                <View style={styles.wrapper}>
+
+              <View style={styles.wrapper}>
                 <View style={styles.groupz}>
-                  <Text style={styles.label}>Drop Date</Text>
+                  <Text style={styles.label}>Pickup Date</Text>
                   <TouchableOpacity
                     style={styles.inputBtn}
-                    onPress={showDatepicker2}
+                    onPress={showDatepicker}
                   >
                     <Text style={{ color: "gray" }}>
-                      {dropDate === new Date(1598051730000) ? (
+                      {date === new Date(1598051730000) ? (
                         "Select Pickup Date"
                       ) : (
                         <Text style={{ color: "#fff" }}>
-                          {dropDate?.toLocaleDateString()}
+                          {date?.toLocaleDateString()}
                         </Text>
                       )}
                     </Text>
                   </TouchableOpacity>
                 </View>
                 <View style={styles.groupz}>
-                  <Text style={styles.label}>Drop Time</Text>
+                  <Text style={styles.label}>Pickup Time</Text>
                   <TouchableOpacity
                     style={styles.inputBtn}
-                    onPress={showTimepicker2}
+                    onPress={showTimepicker}
                   >
                     <Text style={{ color: "gray" }}>
-                      {dropDate === 1598051730000 ? (
+                      {date === 1598051730000 ? (
                         "Select Pickup Time"
                       ) : (
                         <Text style={{ color: "#fff" }}>
-                          {dropDate?.toLocaleTimeString()}
+                          {date?.toLocaleTimeString()}
                         </Text>
                       )}
                     </Text>
                   </TouchableOpacity>
                 </View>
               </View>
+
+              {state === "b" && (
+                <View style={styles.wrapper}>
+                  <View style={styles.groupz}>
+                    <Text style={styles.label}>Return Date</Text>
+                    <TouchableOpacity
+                      style={styles.inputBtn}
+                      onPress={showDatepicker2}
+                    >
+                      <Text style={{ color: "gray" }}>
+                        {dropDate === new Date(1598051730000) ? (
+                          "Select Pickup Date"
+                        ) : (
+                          <Text style={{ color: "#fff" }}>
+                            {dropDate?.toLocaleDateString()}
+                          </Text>
+                        )}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.groupz}>
+                    <Text style={styles.label}>Return Time</Text>
+                    <TouchableOpacity
+                      style={styles.inputBtn}
+                      onPress={showTimepicker2}
+                    >
+                      <Text style={{ color: "gray" }}>
+                        {dropDate === 1598051730000 ? (
+                          "Select Pickup Time"
+                        ) : (
+                          <Text style={{ color: "#fff" }}>
+                            {dropDate?.toLocaleTimeString()}
+                          </Text>
+                        )}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
               )}
             </View>
+
+            <View style={styles.group}>
+              <Text style={styles.label}>Pickup Address</Text>
+              <TextInput
+                value={pickup}
+                style={styles.input}
+                placeholder="Enter Pickup Address"
+                placeholderTextColor={"gray"}
+                onChangeText={(e) => setPickup(e)}
+              />
+            </View>
+            <View style={styles.group}>
+              <Text style={styles.label}>Drop Address</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter Drop Address"
+                placeholderTextColor={"gray"}
+                onChangeText={(e) => setDrop(e)}
+                value={drop}
+              />
+            </View>
+
+            {state === "b" && (
+              <>
+                <View style={styles.group}>
+                  <Text style={styles.label}>Return Pickup Address</Text>
+                  <TextInput
+                    value={returnPickup}
+                    style={styles.input}
+                    placeholder="Enter  Return Pickup Address"
+                    placeholderTextColor={"gray"}
+                    onChangeText={(e) => setReturnPickup(e)}
+                  />
+                </View>
+                <View style={styles.group}>
+                  <Text style={styles.label}>Return Drop Address</Text>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Enter  Return Drop Address"
+                    placeholderTextColor={"gray"}
+                    onChangeText={(e) => setReturnDrop(e)}
+                    value={returnDrop}
+                  />
+                </View>
+              </>
+            )}
 
             <View style={styles.group}>
               <Text style={styles.label}>Select Car</Text>
@@ -397,7 +348,7 @@ const home = () => {
           onChange={onChange}
         />
       )}
-       {show2 && (
+      {show2 && (
         <DateTimePicker
           testID="dateTimePicker"
           value={dropDate}
@@ -418,7 +369,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     flex: 1,
     padding: 20,
-    // backgroundColor: "rgba(0,0,0,0.5)",
+   
   },
   h2: {
     color: colors.primary,
@@ -541,9 +492,8 @@ const styles = StyleSheet.create({
     width: "100%",
     display: "flex",
     flexDirection: "row",
-    gap: 10,
-    marginTop: 20,
-    marginBottom:10
+    gap: 20,
+    marginBottom: 10,
   },
   groupz: {
     display: "flex",
@@ -551,7 +501,7 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 25,
     position: "relative",
-    width: "50%",
+    flex: 1,
   },
   tabs: {
     width: "100%",
@@ -559,6 +509,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
     gap: 10,
+    marginBottom: 20,
   },
   active: {
     backgroundColor: colors.primary,

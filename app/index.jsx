@@ -1,5 +1,5 @@
 import {  Image, ScrollView,  StyleSheet, Text,  View,SafeAreaView } from "react-native";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { colors } from "../assets/color";
 import img from "../assets/img/login.jpg";
 import AuthButton from "../components/AuthButton";
@@ -10,6 +10,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch } from "react-redux";
 
 const RooyLayout = () => {
+  const [loading,setLoading] = useState(false);
 
 const dispatch = useDispatch()
   
@@ -17,6 +18,7 @@ const dispatch = useDispatch()
 
   const fetchUserDetails = async ()=>{
     try {
+      setLoading(true);
       const token = await AsyncStorage.getItem("token");
       const result = await LoadApi(token);
       console.log(result?.data)
@@ -27,6 +29,8 @@ const dispatch = useDispatch()
       
     } catch (error) {
       console.log(error);
+    }finally{
+      setLoading(false);
     }
   }
 
