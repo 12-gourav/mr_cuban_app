@@ -1,60 +1,165 @@
-import { ImageBackground, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  Alert,
+  ImageBackground,
+  Linking,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { colors } from "../../assets/color";
 import img from "../../assets/img/login.jpg";
-import AuthButton from "../../components/AuthButton";
-import {useSelector} from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import Feather from "@expo/vector-icons/Feather";
+import Fontisto from "@expo/vector-icons/Fontisto";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { router } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const accout = () => {
+  const { user } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
 
-  const {user} = useSelector((state)=>state.user)
+  const openPrivacyPolicy = async () => {
+    const url = "https://your-privacy-policy-url.com"; 
+    const supported = await Linking.canOpenURL(url);
+
+    if (supported) {
+      await Linking.openURL(url); 
+    } else {
+      Alert.alert("Error", "Don't know how to open this URL: " + url);
+    }
+  };
+
+  const handleLogout = async () => {
+    AsyncStorage.removeItem("token");
+    dispatch({ type: "logout", payload: "" });
+    router.push("/");
+  };
+
+
+
+
+
+  const confirmLogout = () => {
+    Alert.alert(
+      "Logout",
+      "Are you sure you want to log out?",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Logout cancelled"),
+          style: "cancel"
+        },
+        {
+          text: "Yes",
+          onPress: () => handleLogout(),
+        }
+      ],
+      { cancelable: false }
+    );
+  };
+
+
+
+
 
 
 
   return (
     <ImageBackground
-    source={img}
-    style={{ flex: 1, justifyContent: "center" }}
-    resizeMode="cover"
-  >
-   
+      source={img}
+      style={{ flex: 1, justifyContent: "center" }}
+      resizeMode="cover"
+    >
       <SafeAreaView style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.5)" }}>
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
           <View style={styles.header}>
-            <Text style={styles.h2}>Profile Page</Text>
+            <Text style={styles.h2}>Account Page</Text>
             <Text style={styles.p}>
-              Welcome to your profile! Here, you can manage your account
-              details, view your booking history, and update your preferences.
+              Your personal hub to update profile, enhance security, and tailor
+              your app experience.
             </Text>
           </View>
 
-          <Text style={styles.h4}>Personal Details</Text>
+          <View
+            style={{
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexDirection: "column",
+            }}
+          >
+            <View style={styles.profile}>
+              <Text style={styles.h4}>{String(user?.name)[0]}</Text>
+            </View>
+            <Text style={{ color: "#fff", fontSize: 16, marginTop: 10 }}>
+              {user?.name}
+            </Text>
+            <Text style={{ color: "#fff", fontSize: 16, marginTop: 5 }}>
+              {user?.email}
+            </Text>
+          </View>
 
-          <View style={styles.form}>
-            <Text style={styles.label}>Name</Text>
-            <TextInput style={styles.input} placeholderTextColor={"#fff"} value={user?.name} placeholder="Enter Your Name" />
-          </View>
-          <View style={styles.form}>
-            <Text style={styles.label}>Email</Text>
-            <TextInput style={styles.input} placeholderTextColor={"#fff"} value={user?.email} placeholder="Enter Your Email" />
-          </View>
-          <View style={styles.form}>
-            <Text style={styles.label}>Password</Text>
-            <TextInput style={styles.input} placeholderTextColor={"#fff"} value={user?.password} placeholder="Enter Your Password" />
-          </View>
-          <View style={styles.form}>
-            <Text style={styles.label}>Phone Number</Text>
-            <TextInput style={styles.input} placeholderTextColor={"#fff"} value={user?.phone} placeholder="Enter Your Phone Number" />
-          </View> 
-          <View style={{paddingLeft:20,paddingRight:20}}>
-          <AuthButton title={"Update Profile"}  />
-          </View>
-      
+          <View
+            style={{
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              flexDirection: "column",
+              marginTop: 20,
+              padding: 10,
+            }}
+          >
+            <TouchableOpacity
+              onPress={() => router.push({ pathname: "/update-profile" })}
+            >
+              <View style={styles.link}>
+                <Feather name="edit" size={18} color="#fff" />
+                <Text style={styles.p}>Update Profile</Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{ width: "100%" }}
+              onPress={() => router.push("/aboutus")}
+            >
+              <View style={styles.link}>
+                <Fontisto name="android" size={18} color="#fff" />
+                <Text style={styles.p}>About App</Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity style={{width:"100%"}} onPress={() => openPrivacyPolicy()}>
+              <View style={styles.link}>
+                <MaterialIcons name="policy" size={18} color="#fff" />
+                <Text style={styles.p}>Privacy Policy</Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity style={{width:"100%"}} onPress={() => openPrivacyPolicy()}>
+            <View style={styles.link}>
+              <MaterialCommunityIcons
+                name="newspaper-variant-outline"
+                size={24}
+                color="#fff"
+              />
+              <Text style={styles.p}>Terms & Conditions</Text>
+            </View>
 
+            </TouchableOpacity>
+           <TouchableOpacity onPress={()=>confirmLogout()} style={{width:"100%"}}>
+           <View style={styles.link}>
+              <MaterialCommunityIcons name="logout" size={24} color="#fff" />
+              <Text style={styles.p}>Logout</Text>
+            </View>
+           </TouchableOpacity>
+            
+          </View>
         </ScrollView>
       </SafeAreaView>
-    
     </ImageBackground>
   );
 };
@@ -72,13 +177,11 @@ const styles = StyleSheet.create({
     color: colors.primary,
     marginBottom: 5,
   },
-  h4:{
-    paddingLeft:20,
-    color:"#fff",
-    fontSize: 16,
-    fontWeight: "regular",
-    fontFamily: "regular",
-    marginBottom:15
+  h4: {
+    color: "#fff",
+    fontSize: 46,
+    fontWeight: "bold",
+    fontFamily: "bold",
   },
   p: {
     color: "#fff",
@@ -88,26 +191,26 @@ const styles = StyleSheet.create({
     fontFamily: "regular",
     lineHeight: 20,
   },
-  form: {
-    paddingLeft: 20,
-    paddingRight: 20,
-    marginBottom:15
+  profile: {
+    width: 100,
+    height: 100,
+    borderRadius: 100,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    borderColor: colors.primary,
+    borderWidth: 3,
   },
-  label: {
-    fontSize: 16,
-    fontWeight: "regular",
-    fontFamily: "regular",
-    color: "#fff",
-    marginBottom:5
-  },
-  input: {
+  link: {
     width: "100%",
-    padding: 10,
-    backgroundColor: "rgba(0,0,0,0.6)",
+    display: "flex",
+    flexDirection: "row",
+    gap: 10,
+    alignItems: "center",
+    padding: 15,
+    marginBottom: 15,
+    backgroundColor: "rgba(0,0,0,0.5)",
     borderRadius: 5,
-    color: "#fff",
-    outlineStyle: "none",
-    marginTop:5
-
   },
 });

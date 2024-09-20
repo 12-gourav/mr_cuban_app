@@ -1,6 +1,5 @@
 import {
   Image,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -13,24 +12,19 @@ import { StatusBar } from "expo-status-bar";
 import { colors } from "../../assets/color";
 import img from "../../assets/img/login.jpg";
 import AuthButton from "../../components/AuthButton";
-import lock from "../../assets/img/lock.png";
-import unlock from "../../assets/img/unlock.png";
-import { Link, router } from "expo-router";
+import {  router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LoginApi } from "../../api/auth";
-import { useDispatch, useSelector } from "react-redux";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const SignIn = () => {
-  const {isValid} = useSelector((state)=>state.user);
-  const [show, setShow] = useState(true);
+
+const Forget = () => {
+
+
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const dispatch = useDispatch();
-  
+ 
 
-  const handleLogin = async () => {
+  const hadleSubmit = async () => {
     try {
       const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -42,28 +36,20 @@ const SignIn = () => {
         return ToastAndroid.show("Invalid email address", ToastAndroid.SHORT);
       }
 
-      if (password === "") {
-        return ToastAndroid.show("Password is required", ToastAndroid.SHORT);
-      }
-
-      if (password?.length < 6) {
-        return ToastAndroid.show("Password is too short", ToastAndroid.SHORT);
-      }
-
-      if (password?.length > 16) {
-        return ToastAndroid.show("Password is too long", ToastAndroid.SHORT);
-      }
+     
       setLoading(true);
-      const result = await LoginApi(email, password);
-    console.log(result?.data?.data)
-      if (result?.data?.data) {
-        await AsyncStorage.setItem("token", result?.data?.token);
-        dispatch({ type: "login", payload: result?.data?.data });
-        router.replace("/home");
-        ToastAndroid.show("Login Successfull", ToastAndroid.SHORT);
-      } else {
-        ToastAndroid.show("Login Failed", ToastAndroid.SHORT);
-      }
+    //   const result = await LoginApi(email, password);
+      router.push({pathname:"/reset",params:{
+        email:email
+      }})
+     
+    //   if (result?.data?.data) {
+     
+
+    //     ToastAndroid.show("OTP send to your register email address Successfull", ToastAndroid.SHORT);
+    //   } else {
+    //     ToastAndroid.show("OTP failed to send", ToastAndroid.SHORT);
+    //   }
     } catch (error) {
       console.log(error);
       ToastAndroid.show(error?.response?.data?.msg, ToastAndroid.SHORT);
@@ -71,23 +57,6 @@ const SignIn = () => {
       setLoading(false);
     }
   };
-
-
-
-  useEffect(()=>{
-    if(isValid){
-      router.replace("/home")
-    }
-  },[isValid])
-
-
-
-
-
-console.log(isValid,"ssss")
-
-
-
 
 
 
@@ -100,7 +69,7 @@ console.log(isValid,"ssss")
       />
       <View style={styles.layer}>
         <Text style={styles.p2}>
-          Log in to{" "}
+          Forgot Password{" "}
           <Text
             style={{
               color: colors.primary,
@@ -121,7 +90,7 @@ console.log(isValid,"ssss")
           </Text>
         </Text>
         <View style={styles.formGroup}>
-          <Text style={styles.label}>Email</Text>
+          <Text style={styles.label}>Register Email</Text>
           <TextInput
             style={[styles.input1]}
             placeholder="Enter Email Address"
@@ -129,44 +98,21 @@ console.log(isValid,"ssss")
             placeholderTextColor={"gray"}
           />
         </View>
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Password</Text>
-          <View style={styles.group}>
-            <TextInput
-              style={styles.input2}
-              placeholder="Enter Password"
-              secureTextEntry={show}
-              placeholderTextColor={"gray"}
-              onChangeText={(e) => setPassword(e)}
-            />
-            {show ? (
-              <TouchableOpacity onPress={() => setShow(false)}>
-                <Image style={styles.lock} source={lock} />
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity onPress={() => setShow(true)}>
-                <Image style={styles.lock} source={unlock} />
-              </TouchableOpacity>
-            )}
-          </View>
+
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>
+            We’ll send a verification code to this email if it matches an
+            existing Bright Query account.
+          </Text>
         </View>
 
         <View style={styles.footer}>
-          <Text style={styles.footerText}>Don't have an account?</Text>
-          <TouchableOpacity onPress={() => router.push("/sign-up")}>
-            <Text style={styles.createAccountText}>Create new account</Text>
+          <TouchableOpacity onPress={() => router.push("/sign-in")}>
+            <Text style={styles.createAccountText}>Back to Login page?</Text>
           </TouchableOpacity>
         </View>
 
-        <View style={styles.footer}>
-
-          <TouchableOpacity onPress={() => router.push("/forget")}>
-            <Text style={styles.footerText}>Forgot Password?</Text>
-          </TouchableOpacity>
-        </View>
-
-
-        <AuthButton loading={loading} title="Login" handlePress={() => handleLogin()} />
+        <AuthButton title="Submit" handlePress={() => hadleSubmit()} />
       </View>
 
       <StatusBar backgroundColor="#161622" style="light" />
@@ -174,7 +120,7 @@ console.log(isValid,"ssss")
   );
 };
 
-export default SignIn;
+export default Forget;
 
 const styles = StyleSheet.create({
   container: {
@@ -231,28 +177,8 @@ const styles = StyleSheet.create({
     outlineStyle: "none",
     backgroundColor: "rgba(0,0,0,0.5)",
   },
-  input2: {
-    width: "90%",
-    color: "#fff",
-    padding: 10,
-    borderRadius: 5,
-    borderColor: "transparent",
-    outlineStyle: "none",
-  },
-  group: {
-    width: "100%",
-    backgroundColor: "rgba(0,0,0,0.5)",
-    borderRadius: 5,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    flexDirection: "row",
-    paddingRight: 10,
-  },
-  lock: {
-    width: 20,
-    height: 20,
-  },
+
+
   footer: {
     display: "flex",
     flexDirection: "row",
@@ -263,8 +189,8 @@ const styles = StyleSheet.create({
     display: "flex",
   },
   createAccountText: {
-    color: colors.primary,
+    color: "#fff",
     textDecorationLine: "none",
-    marginLeft: 5,
+   marginTop:5
   },
 });

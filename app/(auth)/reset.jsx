@@ -8,27 +8,27 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import { colors } from "../../assets/color";
 import img from "../../assets/img/login.jpg";
 import AuthButton from "../../components/AuthButton";
 import lock from "../../assets/img/lock.png";
 import unlock from "../../assets/img/unlock.png";
-import { Link, router } from "expo-router";
+import { Link, router, useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LoginApi } from "../../api/auth";
 import { useDispatch, useSelector } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import OTPTextInput from "react-native-otp-textinput";
 
-const SignIn = () => {
-  const {isValid} = useSelector((state)=>state.user);
+const Reset = () => {
+  const { email } = useLocalSearchParams();
   const [show, setShow] = useState(true);
-  const [email, setEmail] = useState("");
+  const [confirm, setConfirm] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const dispatch = useDispatch();
-  
+  let otp = useRef(null);
 
   const handleLogin = async () => {
     try {
@@ -53,17 +53,23 @@ const SignIn = () => {
       if (password?.length > 16) {
         return ToastAndroid.show("Password is too long", ToastAndroid.SHORT);
       }
-      setLoading(true);
-      const result = await LoginApi(email, password);
-    console.log(result?.data?.data)
-      if (result?.data?.data) {
-        await AsyncStorage.setItem("token", result?.data?.token);
-        dispatch({ type: "login", payload: result?.data?.data });
-        router.replace("/home");
-        ToastAndroid.show("Login Successfull", ToastAndroid.SHORT);
-      } else {
-        ToastAndroid.show("Login Failed", ToastAndroid.SHORT);
+      if (confirm !== password) {
+        return ToastAndroid.show(
+          "Password and Confirm Password are not same",
+          ToastAndroid.SHORT
+        );
       }
+      setLoading(true);
+      // const result = await LoginApi(email, password);
+      // console.log(result?.data?.data);
+      // if (result?.data?.data) {
+      //   await AsyncStorage.setItem("token", result?.data?.token);
+      //   dispatch({ type: "login", payload: result?.data?.data });
+      //   router.replace("/home");
+      //   ToastAndroid.show("Login Successfull", ToastAndroid.SHORT);
+      // } else {
+      //   ToastAndroid.show("Login Failed", ToastAndroid.SHORT);
+      // }
     } catch (error) {
       console.log(error);
       ToastAndroid.show(error?.response?.data?.msg, ToastAndroid.SHORT);
@@ -71,25 +77,6 @@ const SignIn = () => {
       setLoading(false);
     }
   };
-
-
-
-  useEffect(()=>{
-    if(isValid){
-      router.replace("/home")
-    }
-  },[isValid])
-
-
-
-
-
-console.log(isValid,"ssss")
-
-
-
-
-
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -100,7 +87,7 @@ console.log(isValid,"ssss")
       />
       <View style={styles.layer}>
         <Text style={styles.p2}>
-          Log in to{" "}
+          Reset Password{" "}
           <Text
             style={{
               color: colors.primary,
@@ -120,13 +107,31 @@ console.log(isValid,"ssss")
             </Text>
           </Text>
         </Text>
+
+        <View style={styles.info}>
+          <Text
+            style={{
+              textAlign: "justify",
+              color: "#fff",
+              fontSize: 13,
+              lineHeight: 20,
+            }}
+          >
+            If you don't see a code in your inbox, check your spam folder. if
+            it's not there, the email address may not be confirmed, or it may
+            not match an existing{" "}
+            <Text style={{ color: colors.primary }}>Mr Cuban</Text> account.
+          </Text>
+        </View>
+
         <View style={styles.formGroup}>
           <Text style={styles.label}>Email</Text>
           <TextInput
             style={[styles.input1]}
             placeholder="Enter Email Address"
-            onChangeText={(e) => setEmail(e)}
+            value={email}
             placeholderTextColor={"gray"}
+            editable={false}
           />
         </View>
         <View style={styles.formGroup}>
@@ -150,23 +155,44 @@ console.log(isValid,"ssss")
             )}
           </View>
         </View>
+        <View style={styles.formGroup}>
+          <Text style={styles.label}>Confirm Password</Text>
+          <TextInput
+            style={[styles.input1]}
+            placeholder="Enter Confirm Password "
+            onChangeText={(e) => setConfirm(e)}
+            placeholderTextColor={"gray"}
+           
+          />
+        </View>
 
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>Don't have an account?</Text>
-          <TouchableOpacity onPress={() => router.push("/sign-up")}>
-            <Text style={styles.createAccountText}>Create new account</Text>
-          </TouchableOpacity>
+        <View style={styles.formGroup}>
+          <Text style={styles.label}>OTP</Text>
+          <OTPTextInput
+            inputCount={6}
+            offTintColor={"No"}
+            ref={(e) => (otp = e)}
+            tintColor={"No"}
+            textInputStyle={{
+              width: 50,
+              height: 50,
+              border: "none",
+              backgroundColor: "rgba(0,0,0,0.5)",
+              borderRadius: 5,
+              color:"#fff",
+              fontSize:18
+             
+            }}
+          />
         </View>
 
         <View style={styles.footer}>
-
           <TouchableOpacity onPress={() => router.push("/forget")}>
-            <Text style={styles.footerText}>Forgot Password?</Text>
+            <Text style={styles.footerText}>Back to Forgot Password page?</Text>
           </TouchableOpacity>
         </View>
 
-
-        <AuthButton loading={loading} title="Login" handlePress={() => handleLogin()} />
+        <AuthButton title="Submit" handlePress={() => handleLogin()} />
       </View>
 
       <StatusBar backgroundColor="#161622" style="light" />
@@ -174,7 +200,7 @@ console.log(isValid,"ssss")
   );
 };
 
-export default SignIn;
+export default Reset;
 
 const styles = StyleSheet.create({
   container: {
@@ -266,5 +292,13 @@ const styles = StyleSheet.create({
     color: colors.primary,
     textDecorationLine: "none",
     marginLeft: 5,
+  },
+  info: {
+    backgroundColor: "rgba(0,0,0,0.5)",
+    color: "#fff",
+    width: "100%",
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
   },
 });

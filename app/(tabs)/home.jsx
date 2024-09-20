@@ -127,11 +127,7 @@ const home = () => {
     fetchAddressLists();
   }, []);
 
-  const handleLogout = async () => {
-    AsyncStorage.removeItem("token");
-    dispatch({ type: "logout", payload: "" });
-    router.push("/");
-  };
+  
 
   return (
     <ImageBackground
@@ -335,7 +331,6 @@ const home = () => {
               </View>
             </View>
             <AuthButton title={"Book  Ride"} handlePress={() => handleRide()} />
-            <AuthButton title={"Logout"} handlePress={() => handleLogout()} />
           </View>
         </ScrollView>
       </SafeAreaView>
