@@ -4,14 +4,18 @@ let url = "https://mr-cuban-app-backend.onrender.com/api/v1";
 
 export const LoginApi = async (email, password) => {
   try {
-    return await axios.post(`${url}/login/user`, {
-      email,
-      password,
-    },{
-      headers:{
-        "Content-Type":"application/json",
-        }
-    });
+    return await axios.post(
+      `${url}/login/user`,
+      {
+        email,
+        password,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
   } catch (error) {
     console.log(error);
   }
@@ -39,5 +43,44 @@ export const LoadApi = async (token) => {
     });
   } catch (error) {
     console.log(error?.response);
+  }
+};
+
+export const ForgotPasswordAPI = async (email) => {
+  try {
+    return await axios.get(`${url}/forgot/user`, {
+      params: { email },
+    });
+  } catch (error) {
+    console.log(error?.response);
+  }
+};
+
+export const ResetPasswordAPI = async (email, password, otp) => {
+  try {
+    return await axios.get(`${url}/reset/password/user`, {
+      params: { email, password, otp },
+    });
+  } catch (error) {
+    console.log(error?.response);
+  }
+};
+
+export const UpdateUserApi = async (name, password, phone, id, token) => {
+  try {
+    return await axios.post(
+      `${url}/update/user`,
+      {
+        name,
+        id,
+        password,
+        phone,
+      },
+      {
+        headers: token,
+      }
+    );
+  } catch (error) {
+    console.log(error?.response?.data?.msg);
   }
 };

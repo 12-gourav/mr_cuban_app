@@ -19,18 +19,18 @@ import AuthButton from "../../components/AuthButton";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { addAddress } from "../../helper";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { CreateOrder } from "../../api/order";
 
 const home = () => {
+  const { user } = useSelector((state) => state.user);
+  const { isOrder } = useSelector((state) => state.order);
   const [date, setDate] = useState(new Date(1598051730000));
   const [dropDate, setDropDate] = useState(new Date(1598051730000));
   const [mode, setMode] = useState("date");
   const [mode2, setMode2] = useState("date");
   const [show, setShow] = useState(false);
   const [show2, setShow2] = useState(false);
-
   const [pickup, setPickup] = useState("Near Boby Guest House lalganj");
   const [drop, setDrop] = useState("Mohanlalganh");
   const [returnPickup, setReturnPickup] = useState(
@@ -38,11 +38,8 @@ const home = () => {
   );
   const [returnDrop, setReturnDrop] = useState("Mohanlalganh");
   const [taxi, setTaxi] = useState("");
-  const [flag, setFlag] = useState(false);
-  const [flag2, setFlag2] = useState(false);
-  const [pickupAddressList, setPickupaddressList] = useState([]);
-  const [dropAddressList, setDropAddressList] = useState([]);
-  const [state, setState] = useState("a");
+  const [state, setState] = useState("One Way");
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
 
   const onChange = (event, selectedDate) => {
@@ -82,52 +79,74 @@ const home = () => {
     showMode("time");
   };
 
-  const handleRide = () => {
-    if (pickup === "")
-      return ToastAndroid.show(
-        "Pickup address is required",
-        ToastAndroid.SHORT
-      );
-    if (drop === "")
-      return ToastAndroid.show("Drop address is required", ToastAndroid.SHORT);
-    if (taxi === "")
-      return ToastAndroid.show("Car is required", ToastAndroid.SHORT);
-    addAddress("pickup", pickup);
-    addAddress("drop", drop);
-    router.push({
-      pathname: "/search",
-      params: {
-        pickup: pickup,
-        drop: drop,
-        date: date,
-        dropDate: dropDate,
-        taxi: taxi,
-        way: state,
-        returnPickup:returnPickup,
-        returnDrop:returnDrop
-      },
-    });
-  };
-
-  const fetchAddressLists = async () => {
+  
+  const handleRide = async () => {
     try {
-      // Fetch pickup addresses
-      let data1 = await AsyncStorage.getItem("pickup");
-      setPickupaddressList(data1 ? JSON.parse(data1) : []);
+      if (pickup === "")
+        return ToastAndroid.show(
+          "Pickup address is required",
+          ToastAndroid.SHORT
+        );
+      if (drop === "")
+        return ToastAndroid.show(
+          "Drop address is required",
+          ToastAndroid.SHORT
+        );
+      if (taxi === "")
+        return ToastAndroid.show("Car is required", ToastAndroid.SHORT);
 
-      // Fetch drop addresses
-      let data2 = await AsyncStorage.getItem("drop");
-      setDropAddressList(data2 ? JSON.parse(data2) : []);
+      setLoading(true);
+
+      const result = await CreateOrder(
+        pickup,
+        drop,
+        returnPickup,
+        returnDrop,
+        date,
+        dropDate,
+        state,
+        user?._id,
+        user?.otp
+      );
+      if (result?.data?.data) {
+        dispatch({ type: "createOrder", payload: true });
+        ToastAndroid.show("Ride Request Created 🚗", ToastAndroid.SHORT);
+        router.push({
+          pathname: "/search",
+          params: {
+            pickup: pickup,
+            drop: drop,
+            date: date,
+            dropDate: dropDate,
+            taxi: taxi,
+            way: state,
+            returnPickup: returnPickup,
+            returnDrop: returnDrop,
+            id: user?._id,
+          },
+        });
+      } else {
+        ToastAndroid.show(
+          "Something went wrong. Order can not be create at this moment",
+          ToastAndroid.SHORT
+        );
+      }
     } catch (error) {
-      console.error("Error fetching address lists:", error.message);
+      console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchAddressLists();
-  }, []);
-
-  
+    if (isOrder) {
+      ToastAndroid.show(
+        "Ride Request already Created 🚗 ? If you want to go back then first cancel your ride",
+        ToastAndroid.SHORT
+      );
+      router.push("/search");
+    }
+  }, [isOrder]);
 
   return (
     <ImageBackground
@@ -156,14 +175,14 @@ const home = () => {
             <View>
               <View style={styles.tabs}>
                 <TouchableOpacity
-                  onPress={() => setState("a")}
-                  style={state === "a" ? styles.active : styles.tab1}
+                  onPress={() => setState("One Way")}
+                  style={state === "One Way" ? styles.active : styles.tab1}
                 >
                   <Text style={styles.tab_p}>One Way Trip</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  onPress={() => setState("b")}
-                  style={state === "b" ? styles.active : styles.tab1}
+                  onPress={() => setState("Round Trip")}
+                  style={state === "Round Trip" ? styles.active : styles.tab1}
                 >
                   <Text style={styles.tab_p}>Round Trip</Text>
                 </TouchableOpacity>
@@ -206,7 +225,7 @@ const home = () => {
                 </View>
               </View>
 
-              {state === "b" && (
+              {state === "Round Trip" && (
                 <View style={styles.wrapper}>
                   <View style={styles.groupz}>
                     <Text style={styles.label}>Return Date</Text>
@@ -267,7 +286,7 @@ const home = () => {
               />
             </View>
 
-            {state === "b" && (
+            {state === "Round Trip" && (
               <>
                 <View style={styles.group}>
                   <Text style={styles.label}>Return Pickup Address</Text>
@@ -330,7 +349,11 @@ const home = () => {
                 />
               </View>
             </View>
-            <AuthButton title={"Book  Ride"} handlePress={() => handleRide()} />
+            <AuthButton
+              loading={loading}
+              title={"Book  Ride"}
+              handlePress={() => handleRide()}
+            />
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -364,7 +387,6 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     flex: 1,
     padding: 20,
-   
   },
   h2: {
     color: colors.primary,

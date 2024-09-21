@@ -1,24 +1,59 @@
-import { ImageBackground, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
-import React from "react";
+import {
+  ImageBackground,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  ToastAndroid,
+  View,
+} from "react-native";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { colors } from "../../assets/color";
 import img from "../../assets/img/login.jpg";
 import AuthButton from "../../components/AuthButton";
-import {useSelector} from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { LoadApi, UpdateUserApi } from "../../api/auth";
 
 const accout = () => {
+  const { user } = useSelector((state) => state.user);
+  const [name, setName] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const {user} = useSelector((state)=>state.user)
+  const dispatch = useDispatch();
 
+  const handleUpdate = async () => {
+    try {
+      setLoading(true);
+      const token = await AsyncStorage.getItem("token");
+      const result = await UpdateUserApi(name, password,user?.phone, user?._id,token);
+      if (result?.data?.data) {
+        const result1 = await LoadApi(token);
+        if (result1?.data?.data) {
+          dispatch({ type: "load", payload: result?.data?.data });
+          ToastAndroid.show("Profile Update Successfully", ToastAndroid.SHORT);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }finally{
+      setLoading(false)
+    }
+  };
 
+  useEffect(() => {
+    setPassword(user?.password);
+    setName(user?.name);
+  }, [user]);
 
   return (
     <ImageBackground
-    source={img}
-    style={{ flex: 1, justifyContent: "center" }}
-    resizeMode="cover"
-  >
-   
+      source={img}
+      style={{ flex: 1, justifyContent: "center" }}
+      resizeMode="cover"
+    >
       <SafeAreaView style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.5)" }}>
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
           <View style={styles.header}>
@@ -33,28 +68,58 @@ const accout = () => {
 
           <View style={styles.form}>
             <Text style={styles.label}>Name</Text>
-            <TextInput style={styles.input} placeholderTextColor={"#fff"} value={user?.name} placeholder="Enter Your Name" />
+            <TextInput
+              style={styles.input}
+              placeholderTextColor={"#fff"}
+              value={name}
+              onChangeText={(e)=>setName(e)}
+              placeholder="Enter Your Name"
+            />
           </View>
           <View style={styles.form}>
             <Text style={styles.label}>Email</Text>
-            <TextInput style={styles.input} placeholderTextColor={"#fff"} value={user?.email} placeholder="Enter Your Email" />
+            <TextInput
+              style={styles.input}
+              placeholderTextColor={"#fff"}
+              value={user?.email}
+              placeholder="Enter Your Email"
+              editable={false}
+            />
           </View>
           <View style={styles.form}>
             <Text style={styles.label}>Password</Text>
-            <TextInput style={styles.input} placeholderTextColor={"#fff"} value={user?.password} placeholder="Enter Your Password" />
+            <TextInput
+              style={styles.input}
+              placeholderTextColor={"#fff"}
+              value={password}
+              onChangeText={(e)=>setPassword(e)}
+              placeholder="Enter Your Password"
+            />
           </View>
           <View style={styles.form}>
             <Text style={styles.label}>Phone Number</Text>
-            <TextInput style={styles.input} placeholderTextColor={"#fff"} value={user?.phone} placeholder="Enter Your Phone Number" />
-          </View> 
-          <View style={{paddingLeft:20,paddingRight:20}}>
-          <AuthButton title={"Update Profile"}  />
+            <TextInput
+              style={styles.input}
+              placeholderTextColor={"#fff"}
+              value={user?.phone}
+              placeholder="Enter Your Phone Number"
+              editable={false}
+            />
           </View>
-      
-
+          <View style={styles.form}>
+            <Text style={styles.label}>OTP</Text>
+            <TextInput
+              style={styles.input}
+              placeholderTextColor={"#fff"}
+              value={user?.accountOtp}
+              editable={false}
+            />
+          </View>
+          <View style={{ paddingLeft: 20, paddingRight: 20 }}>
+            <AuthButton loading={loading} handlePress={handleUpdate} title={"Update Profile"} />
+          </View>
         </ScrollView>
       </SafeAreaView>
-    
     </ImageBackground>
   );
 };
@@ -72,13 +137,13 @@ const styles = StyleSheet.create({
     color: colors.primary,
     marginBottom: 5,
   },
-  h4:{
-    paddingLeft:20,
-    color:"#fff",
+  h4: {
+    paddingLeft: 20,
+    color: "#fff",
     fontSize: 16,
     fontWeight: "regular",
     fontFamily: "regular",
-    marginBottom:15
+    marginBottom: 15,
   },
   p: {
     color: "#fff",
@@ -91,14 +156,14 @@ const styles = StyleSheet.create({
   form: {
     paddingLeft: 20,
     paddingRight: 20,
-    marginBottom:15
+    marginBottom: 15,
   },
   label: {
     fontSize: 16,
     fontWeight: "regular",
     fontFamily: "regular",
     color: "#fff",
-    marginBottom:5
+    marginBottom: 5,
   },
   input: {
     width: "100%",
@@ -107,7 +172,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     color: "#fff",
     outlineStyle: "none",
-    marginTop:5
-
+    marginTop: 5,
   },
 });

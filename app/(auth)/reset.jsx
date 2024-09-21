@@ -8,19 +8,17 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import { colors } from "../../assets/color";
 import img from "../../assets/img/login.jpg";
 import AuthButton from "../../components/AuthButton";
 import lock from "../../assets/img/lock.png";
 import unlock from "../../assets/img/unlock.png";
-import { Link, router, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { LoginApi } from "../../api/auth";
-import { useDispatch, useSelector } from "react-redux";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import OTPTextInput from "react-native-otp-textinput";
+import { ResetPasswordAPI } from "../../api/auth";
 
 const Reset = () => {
   const { email } = useLocalSearchParams();
@@ -28,7 +26,21 @@ const Reset = () => {
   const [confirm, setConfirm] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  let otp = useRef(null);
+  const [otp, setOtp] = useState([]);
+
+
+const handleCellTextChange = (cellText, cellIndex) => {
+  const newOtp = [...otp]; // Copy the current OTP array
+  newOtp[cellIndex] = cellText; // Update the specific cell
+  setOtp(newOtp); // Update the state with the new OTP array
+};
+
+const getFullOtp = () => {
+  return otp.join(''); // Join the array into a single string
+};
+
+
+
 
   const handleLogin = async () => {
     try {
@@ -59,17 +71,22 @@ const Reset = () => {
           ToastAndroid.SHORT
         );
       }
+      if (otp?.length !==6) {
+        return ToastAndroid.show(
+          "OTP is must be six character",
+          ToastAndroid.SHORT
+        );
+      }
+     
       setLoading(true);
-      // const result = await LoginApi(email, password);
-      // console.log(result?.data?.data);
-      // if (result?.data?.data) {
-      //   await AsyncStorage.setItem("token", result?.data?.token);
-      //   dispatch({ type: "login", payload: result?.data?.data });
-      //   router.replace("/home");
-      //   ToastAndroid.show("Login Successfull", ToastAndroid.SHORT);
-      // } else {
-      //   ToastAndroid.show("Login Failed", ToastAndroid.SHORT);
-      // }
+      let otpnew = getFullOtp()
+      const result = await ResetPasswordAPI(email, password, otpnew);
+      if (result?.data?.data) {
+        router.replace("/sign-in");
+        ToastAndroid.show("Password Reset Successfull", ToastAndroid.SHORT);
+      } else {
+        ToastAndroid.show("Failed to Reset Password", ToastAndroid.SHORT);
+      }
     } catch (error) {
       console.log(error);
       ToastAndroid.show(error?.response?.data?.msg, ToastAndroid.SHORT);
@@ -162,7 +179,6 @@ const Reset = () => {
             placeholder="Enter Confirm Password "
             onChangeText={(e) => setConfirm(e)}
             placeholderTextColor={"gray"}
-           
           />
         </View>
 
@@ -171,7 +187,9 @@ const Reset = () => {
           <OTPTextInput
             inputCount={6}
             offTintColor={"No"}
-            ref={(e) => (otp = e)}
+            // ref={(e) => (otp = e)}
+            
+            handleCellTextChange={handleCellTextChange}
             tintColor={"No"}
             textInputStyle={{
               width: 50,
@@ -179,9 +197,8 @@ const Reset = () => {
               border: "none",
               backgroundColor: "rgba(0,0,0,0.5)",
               borderRadius: 5,
-              color:"#fff",
-              fontSize:18
-             
+              color: "#fff",
+              fontSize: 18,
             }}
           />
         </View>
@@ -192,7 +209,11 @@ const Reset = () => {
           </TouchableOpacity>
         </View>
 
-        <AuthButton title="Submit" handlePress={() => handleLogin()} />
+        <AuthButton
+          loading={loading}
+          title="Submit"
+          handlePress={() => handleLogin()}
+        />
       </View>
 
       <StatusBar backgroundColor="#161622" style="light" />

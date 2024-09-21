@@ -12,17 +12,13 @@ import { StatusBar } from "expo-status-bar";
 import { colors } from "../../assets/color";
 import img from "../../assets/img/login.jpg";
 import AuthButton from "../../components/AuthButton";
-import {  router } from "expo-router";
+import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { LoginApi } from "../../api/auth";
-
+import { ForgotPasswordAPI } from "../../api/auth";
 
 const Forget = () => {
-
-
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
- 
 
   const hadleSubmit = async () => {
     try {
@@ -35,21 +31,22 @@ const Forget = () => {
       if (!emailPattern.test(email)) {
         return ToastAndroid.show("Invalid email address", ToastAndroid.SHORT);
       }
-
-     
       setLoading(true);
-    //   const result = await LoginApi(email, password);
-      router.push({pathname:"/reset",params:{
-        email:email
-      }})
-     
-    //   if (result?.data?.data) {
-     
-
-    //     ToastAndroid.show("OTP send to your register email address Successfull", ToastAndroid.SHORT);
-    //   } else {
-    //     ToastAndroid.show("OTP failed to send", ToastAndroid.SHORT);
-    //   }
+      const result = await ForgotPasswordAPI(email);
+      if (result?.data?.data) {
+        ToastAndroid.show(
+          "OTP send to your register email address Successfull",
+          ToastAndroid.SHORT
+        );
+        router.push({
+          pathname: "/reset",
+          params: {
+            email: email,
+          },
+        });
+      } else {
+        ToastAndroid.show("OTP failed to send", ToastAndroid.SHORT);
+      }
     } catch (error) {
       console.log(error);
       ToastAndroid.show(error?.response?.data?.msg, ToastAndroid.SHORT);
@@ -57,8 +54,6 @@ const Forget = () => {
       setLoading(false);
     }
   };
-
-
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -112,7 +107,11 @@ const Forget = () => {
           </TouchableOpacity>
         </View>
 
-        <AuthButton title="Submit" handlePress={() => hadleSubmit()} />
+        <AuthButton
+          loading={loading}
+          title="Submit"
+          handlePress={() => hadleSubmit()}
+        />
       </View>
 
       <StatusBar backgroundColor="#161622" style="light" />
@@ -178,7 +177,6 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.5)",
   },
 
-
   footer: {
     display: "flex",
     flexDirection: "row",
@@ -191,6 +189,6 @@ const styles = StyleSheet.create({
   createAccountText: {
     color: "#fff",
     textDecorationLine: "none",
-   marginTop:5
+    marginTop: 5,
   },
 });

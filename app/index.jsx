@@ -30,7 +30,7 @@ const RooyLayout = () => {
         return router.replace("/sign-in")
       }
       const result = await LoadApi(token);
-      console.log(result?.data);
+  
       if (result?.data?.data) {
         dispatch({ type: "load", payload: result?.data?.data });
         router.replace("/home");

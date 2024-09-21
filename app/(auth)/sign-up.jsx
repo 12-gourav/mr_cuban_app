@@ -19,6 +19,7 @@ import { Link, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { RegisterApi } from "../../api/auth";
 import { useDispatch } from "react-redux";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const SignUp = () => {
   const [show, setShow] = useState(true);
@@ -56,7 +57,7 @@ const SignUp = () => {
       setLoading(true);
       const result = await RegisterApi(name, email, phone, password);
       if (result?.data?.data) {
-        localStorage.setItem("token", result?.data?.token);
+        AsyncStorage.setItem("token", result?.data?.token);
         dispatch({ type: "login", payload: result?.data?.data });
         ToastAndroid.show("Registration Successfull", ToastAndroid.SHORT);
         router.push("/home")

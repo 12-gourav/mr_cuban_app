@@ -17,6 +17,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import AuthButton from "../../components/AuthButton";
 import { router, useLocalSearchParams } from "expo-router";
 import Fontisto from "@expo/vector-icons/Fontisto";
+import { useSelector } from "react-redux";
 
 const detail = () => {
   const {
@@ -34,34 +35,17 @@ const detail = () => {
     modelName,
   } = useLocalSearchParams();
 
-  const [loading,setLoading] = useState(false);
+  const { user } = useSelector((state) => state.user);
+  const [loading, setLoading] = useState(false);
 
-
-  const CreateOrder = async ()=>{
+  const CreateOrder = async () => {
     try {
-
-
-        
-        
     } catch (error) {
-        console.log(error)
+      console.log(error);
     }
-  }
+  };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  console.log(user);
 
   return (
     <ImageBackground
@@ -70,9 +54,8 @@ const detail = () => {
       resizeMode="cover"
     >
       <SafeAreaView style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.5)" }}>
-   
         <View style={styles.back}>
-          <TouchableOpacity onPress={()=>router.back()}>
+          <TouchableOpacity onPress={() => router.back()}>
             <Ionicons
               name="arrow-back-circle"
               size={34}
@@ -82,14 +65,24 @@ const detail = () => {
         </View>
 
         <View style={styles.door}>
-        <ScrollView contentContainerStyle={{ flexGrow:1,paddingBottom:40}}>
+          <ScrollView
+            contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }}
+          >
             <View style={styles.wrap}>
               <Text style={styles.text}>Confirmation Order</Text>
               <View style={styles.otp}>
-                <Text style={styles.otptext}>9</Text>
-                <Text style={styles.otptext}>2</Text>
-                <Text style={styles.otptext}>0</Text>
-                <Text style={styles.otptext}>2</Text>
+                <Text style={styles.otptext}>
+                  {String(user?.accountOtp)[0]}
+                </Text>
+                <Text style={styles.otptext}>
+                  {String(user?.accountOtp)[1]}
+                </Text>
+                <Text style={styles.otptext}>
+                  {String(user?.accountOtp)[2]}
+                </Text>
+                <Text style={styles.otptext}>
+                  {String(user?.accountOtp)[3]}
+                </Text>
               </View>
             </View>
             <View style={styles.profile}>
@@ -118,12 +111,13 @@ const detail = () => {
             </View>
             <View style={styles.form}>
               <Text style={styles.label}>Round Trip</Text>
-              <Text style={styles.text1}>{way === "b" ? "Yes" : "No"}</Text>
+              <Text style={styles.text1}>
+                {way === "Round Trip" ? "Yes" : "No"}
+              </Text>
             </View>
             <View style={styles.form}>
               <Text style={styles.label}>Total Price</Text>
-              <Text style={styles.text1}>₹
-              {price}</Text>
+              <Text style={styles.text1}>₹{price}</Text>
             </View>
             <View style={styles.form}>
               <Text style={styles.label}>Pickup Location</Text>
@@ -156,9 +150,13 @@ const detail = () => {
               </>
             )}
             <AuthButton title={"Confirm Order"} />
-            </ScrollView>
+            <Text style={{fontSize:14,marginTop:10,color:"#fff"}}>
+              Your ride has started! Share this OTP with your driver:{" "}
+              {user?.accountOtp}. Please do not share this OTP before the ride
+              begins.
+            </Text>
+          </ScrollView>
         </View>
-      
       </SafeAreaView>
     </ImageBackground>
   );
@@ -174,9 +172,9 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 20,
-    bottom:0,
-    height:"90%",
-    top:"10%"
+    bottom: 0,
+    height: "90%",
+    top: "10%",
   },
   wrap: {
     width: "100%",
@@ -262,9 +260,9 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
   },
-  back:{
-    color:"#fff",
-    marginTop:20,
-    marginLeft:20
-  }
+  back: {
+    color: "#fff",
+    marginTop: 20,
+    marginLeft: 20,
+  },
 });
