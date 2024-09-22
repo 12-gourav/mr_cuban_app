@@ -25,19 +25,9 @@ const HistoryOrder = () => {
 
   const dispatch = useDispatch();
 
-  const handleLoadMore = () => {
-    if (!loading && !isEndReached) {
-      setCurrent(current + 1);
-    }
-  };
 
-  const renderFooter = () => {
-    return loading ? (
-      <View style={{ padding: 10 }}>
-        <ActivityIndicator size="large" />
-      </View>
-    ) : null;
-  };
+
+
 
   const FetchRides = async () => {
     try {
@@ -55,10 +45,11 @@ const HistoryOrder = () => {
   };
 
   useEffect(() => {
+    
     FetchRides();
-  }, [current]);
+  }, [current,]);
 
-  console.log(state);
+  console.log(state,"lll");
 
   return (
     <View style={styles.flat}>
@@ -154,9 +145,7 @@ const HistoryOrder = () => {
           )}
           horizontal={false}
           showsVerticalScrollIndicator={false}
-          onEndReached={handleLoadMore}
-          onEndReachedThreshold={0.5} // Trigger load more when scrolling is 50% from the bottom
-          ListFooterComponent={renderFooter}
+        
         />
       )}
     </View>
