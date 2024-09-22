@@ -99,9 +99,7 @@ const HistoryOrder = () => {
                   marginBottom: 20,
                   overflow: "hidden",
                 }}
-                onEndReached={handleLoadMore}
-                onEndReachedThreshold={0.5} // Trigger load more when scrolling is 50% from the bottom
-                ListFooterComponent={renderFooter}
+             
               >
                 <View
                   style={{ display: "flex", flexDirection: "row", gap: 10 }}
@@ -156,6 +154,9 @@ const HistoryOrder = () => {
           )}
           horizontal={false}
           showsVerticalScrollIndicator={false}
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.5} // Trigger load more when scrolling is 50% from the bottom
+          ListFooterComponent={renderFooter}
         />
       )}
     </View>
