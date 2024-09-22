@@ -55,7 +55,6 @@ const SignIn = () => {
       }
       setLoading(true);
       const result = await LoginApi(email, password);
-    console.log(result?.data?.data)
       if (result?.data?.data) {
         await AsyncStorage.setItem("token", result?.data?.token);
         dispatch({ type: "login", payload: result?.data?.data });

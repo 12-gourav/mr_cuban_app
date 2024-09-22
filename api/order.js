@@ -68,12 +68,79 @@ export const CancelOrderAPI = async (id) => {
 
 
 
-
-export const AcceptOrderAPI = async (id) => {
+export const CancelOrderAfterAPI = async (coi,doi) => {
   try {
-    return await axios.get(`${url}/cancel/lead/customer`, {
+    return await axios.get(`${url}/cancel/lead/customer/after`, {
       params:{
-        id
+        coi,doi
+      },
+      
+    });
+  } catch (error) {
+    console.log(error?.response);
+  }
+};
+
+
+
+
+export const AcceptOrderAPI = async (orderId, driverId, customerId, name ) => {
+  try {
+    return await axios.post(`${url}/accept/lead/customer`, {
+      orderId, driverId, customerId, name 
+      
+    });
+  } catch (error) {
+    console.log(error?.response);
+  }
+};
+
+
+
+
+export const GetRidesAPI = async (id) => {
+  try {
+   
+    return await axios.get(`${url}/get/lead/drivers`, {
+      params:{
+        orderId:id
+      },
+      
+    });
+  } catch (error) {
+    console.log(error?.response);
+  }
+};
+
+
+
+
+
+export const GetCurrentOrdersAPI = async (page,id) => {
+  try {
+   
+    return await axios.get(`${url}/get/customer/upcoming/order`, {
+      params:{
+        id:id,
+        page,
+        limit:10
+      },
+      
+    });
+  } catch (error) {
+    console.log(error?.response);
+  }
+};
+
+
+export const GetHistoryOrdersAPI = async (page,id) => {
+  try {
+   
+    return await axios.get(`${url}/get/customer/history/order`, {
+      params:{
+        id:id,
+        page,
+        limit:10
       },
       
     });

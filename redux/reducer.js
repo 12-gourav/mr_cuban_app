@@ -19,12 +19,14 @@ export const userReducer = createReducer(
   }
 );
 
-export const orderReducer = createReducer({ isOrder: false }, (builder) => {
+export const orderReducer = createReducer({ isOrder: false,order:null }, (builder) => {
   builder
     .addCase("createOrder", (state, action) => {
       state.isOrder = action.payload;
     })
     .addCase("deleteOrder", (state, action) => {
       state.isOrder = action.payload;
-    });
+    }).addCase("addOrder", (state, action) => {
+      state.order = action.payload;
+    })
 });

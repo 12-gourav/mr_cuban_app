@@ -110,7 +110,7 @@ const home = () => {
       );
       if (result?.data?.data) {
         dispatch({ type: "createOrder", payload: true });
-        ToastAndroid.show("Ride Request Created 🚗", ToastAndroid.SHORT);
+        ToastAndroid.show("Ride Request Creat🚗ed ", ToastAndroid.SHORT);
         router.push({
           pathname: "/search",
           params: {

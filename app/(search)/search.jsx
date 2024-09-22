@@ -18,15 +18,15 @@ import img2 from "../../assets/img/car3.png";
 import star from "../../assets/img/star.png";
 import { colors } from "../../assets/color";
 import { SafeAreaView } from "react-native-safe-area-context";
-import drivers from "../../constants/Driver";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
-import { CancelOrderAPI, SearchOrders } from "../../api/order";
+import { CancelOrderAPI, GetRidesAPI, SearchOrders } from "../../api/order";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "expo-router";
 import AuthButton from "../../components/AuthButton";
+import img3 from "../../assets/img/taxi_loader.gif";
 
 const search = () => {
   const { isOrder } = useSelector((state) => state.order);
@@ -35,6 +35,9 @@ const search = () => {
   const [loading, setLoading] = useState(false);
   const [loading2, setLoading2] = useState(false);
   const [state, setState] = useState();
+  const [rides, setRides] = useState([]);
+  const [rideLoading, setRideLoading] = useState(false);
+  const [total,setTotal] = useState(0)
   const router = useRouter();
   const dispatch = useDispatch();
 
@@ -45,8 +48,10 @@ const search = () => {
       const result = await SearchOrders(user?._id, token);
       if (result?.data?.data) {
         setState(result?.data?.data);
+        setRides(result?.data?.data?.drivers);
       } else {
         setState([]);
+        setRides([]);
       }
     } catch (error) {
       console.log(error);
@@ -93,17 +98,39 @@ const search = () => {
     return () => backHandler.remove();
   }, [isOrder]);
 
+  const fetchRides = async () => {
+    try {
+      setRideLoading(true);
+      const result = await GetRidesAPI(state?._id);
+    
+      if (result?.data?.data) {
+        setRides(result?.data?.data?.drivers);
+
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setRideLoading(false);
+    }
+  };
+
   useEffect(() => {
-    if (isOrder) {
-      // const intervalId = setInterval(() => {
-      SearchRides();
-      // }, 20000); // 20 seconds in milliseconds
+    if (state?._id ) {
+      const intervalId = setInterval(() => {
+     
+        fetchRides();
+      },10000); // 5 seconds in milliseconds
 
       // Cleanup interval on component unmount
-      // return () => clearInterval(intervalId);
+      return () => clearInterval(intervalId);
+    }
+  }, [state?._id]);
+
+  useEffect(() => {
+    if (isOrder) {
+      SearchRides();
     }
   }, [isOrder]);
-
 
 
 
@@ -124,7 +151,7 @@ const search = () => {
             </Text>
           </View>
         ) : (
-          <View style={{flex:1}}>
+          <View style={{ flex: 1 }}>
             <View style={styles.topWrap}>
               <View style={styles.top}>
                 <View style={styles.line}>
@@ -262,139 +289,155 @@ const search = () => {
             </View>
 
             <View style={styles.flat}>
-              <FlatList
-                data={state?.drivers}
-                showsHorizontalScrollIndicator={false}
-                renderItem={({ item, index }) => (
-                  <TouchableOpacity
-                    onPress={() =>
-                      router.push({
-                        pathname: "/detail",
-                        params: {
-                          name: item?.name,
-                          rating: item?.rating,
-                          order: item?.orders,
-                          price: item?.price,
-                          pickup: state?.pickup_address,
-                          drop: state?.drop_address,
-                          way: state?.trip_type,
-                          returnPickup: state?.return_pickup_address,
-                          returnDrop: state?.return_drop_address,
-                          dropDate: state?.return_date,
-                          pickupDate: state?.pickup_date,
-                          modelName: item?.model,
-                        },
-                      })
-                    }
-                  >
-                    <BlurView
-                      intensity={70}
-                      style={{
-                        width: "100%",
-                        borderRadius: 10,
-                        padding: 20,
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: 10,
-                        marginBottom: 20,
-                        overflow: "hidden",
-                      }}
-                      key={item?.id}
+              {rides?.length === 0 ? (
+                <View style={{flex:1,display:"flex",justifyContent:"center",alignItems:"center"}}>
+                <View style={styles.loader2}>
+                  <Image resizeMode="contain" style={{width:"100%",height:"100%"}} source={img3} />
+                </View>
+                </View>
+              ) : (
+                <FlatList
+                  data={rides}
+                  showsHorizontalScrollIndicator={false}
+                  renderItem={({ item, index }) => (
+                    <TouchableOpacity
+                      onPress={() =>
+                        router.push({
+                          pathname: "/detail",
+                          params: {
+                            name: item?.name,
+                            rating: item?.rating,
+                            order: item?.orders,
+                            price: item?.price,
+                            pickup: state?.pickup_address,
+                            drop: state?.drop_address,
+                            way: state?.trip_type,
+                            returnPickup: state?.return_pickup_address,
+                            returnDrop: state?.return_drop_address,
+                            dropDate: state?.return_date +" | " +state?.return_time,
+                            pickupDate: state?.pickup_date + " | "+state?.pickup_time,
+                            modelName: item?.model,
+                            order_id:state?._id,
+                            driver_id:item?.id
+                          },
+                        })
+                      }
                     >
-                      <View
+                      <BlurView
+                        intensity={70}
                         style={{
+                          width: "100%",
+                          borderRadius: 10,
+                          padding: 20,
                           display: "flex",
-                          flexDirection: "row",
-                          gap: 20,
+                          flexDirection: "column",
+                          gap: 10,
+                          marginBottom: 20,
+                          overflow: "hidden",
                         }}
+                        key={item?.id}
                       >
-                        <View style={styles.left}>
-                          <Image
-                            resizeMode="contain"
-                            style={{ width: 100 }}
-                            source={img2}
-                          />
-                          <View
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              flexDirection: "row",
-                              gap: 10,
-                            }}
-                          >
-                            <Text
+                        <View
+                          style={{
+                            display: "flex",
+                            flexDirection: "row",
+                            gap: 20,
+                          }}
+                        >
+                          <View style={styles.left}>
+                            <Image
+                              resizeMode="contain"
+                              style={{ width: 100 }}
+                              source={img2}
+                            />
+                            <View
                               style={{
-                                color: "white",
                                 display: "flex",
                                 alignItems: "center",
-                                gap: 2,
+                                flexDirection: "row",
+                                gap: 10,
                               }}
                             >
-                              {item.rating}{" "}
-                              <Image
-                                source={star}
-                                resizeMode="contain"
-                                style={{ width: 15, height: 15 }}
-                              />{" "}
-                            </Text>
-                            <Text
-                              style={{
-                                color: "white",
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 2,
-                              }}
-                            >
-                              {item.orders}{" "}
-                              <Text style={{ color: colors.green }}>
-                                Orders
+                              <Text
+                                style={{
+                                  color: "white",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 2,
+                                }}
+                              >
+                                {item.rating}{" "}
+                                <Image
+                                  source={star}
+                                  resizeMode="contain"
+                                  style={{ width: 15, height: 15 }}
+                                />{" "}
+                              </Text>
+                              <Text
+                                style={{
+                                  color: "white",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 2,
+                                }}
+                              >
+                                {item.orders}{" "}
+                                <Text style={{ color: colors.green }}>
+                                  Orders
+                                </Text>
+                              </Text>
+                            </View>
+                          </View>
+                          <View style={styles.right}>
+                            <Text style={styles.h2}>{item.name}</Text>
+                            <Text style={styles.p4}>
+                              <Text>
+                                Model Name:{" "}
+                                <Text style={{ color: "white" }}>
+                                  {item.model}
+                                </Text>
                               </Text>
                             </Text>
+                            <Text style={styles.p3}> ₹{item.price}</Text>
                           </View>
                         </View>
-                        <View style={styles.right}>
-                          <Text style={styles.h2}>{item.name}</Text>
-                          <Text style={styles.p4}>
-                            <Text>
-                              Model Name:{" "}
-                              <Text style={{ color: "white" }}>
-                                {item.model}
-                              </Text>
-                            </Text>
-                          </Text>
-                          <Text style={styles.p3}> ₹{item.price}</Text>
+                        <View style={styles.inputset}>
+                          <View style={styles.pin}>
+                            <FontAwesome
+                              name="map-pin"
+                              size={24}
+                              color="white"
+                            />
+                          </View>
+                          <View style={styles.line2}></View>
+                          <Text style={styles.ov}>{state?.trip_type}</Text>
+                          <View style={styles.line2}></View>
+                          <View style={styles.pin}>
+                            <FontAwesome5
+                              name="map-marker-alt"
+                              size={24}
+                              color="white"
+                            />
+                          </View>
                         </View>
-                      </View>
-                      <View style={styles.inputset}>
-                        <View style={styles.pin}>
-                          <FontAwesome name="map-pin" size={24} color="white" />
-                        </View>
-                        <View style={styles.line2}></View>
-                        <Text style={styles.ov}>{state?.trip_type}</Text>
-                        <View style={styles.line2}></View>
-                        <View style={styles.pin}>
-                          <FontAwesome5
-                            name="map-marker-alt"
-                            size={24}
-                            color="white"
-                          />
-                        </View>
-                      </View>
-                    </BlurView>
-                  </TouchableOpacity>
-                )}
-                horizontal={false}
-                showsVerticalScrollIndicator={false}
-              />
-              <AuthButton
-                title={"Cancel Ride"}
-                loading={loading2}
-                handlePress={CancelOrder}
-              />
+                      </BlurView>
+                    </TouchableOpacity>
+                  )}
+                  horizontal={false}
+                  showsVerticalScrollIndicator={false}
+                />
+              )}
+
+              {rides?.length > 0 && (
+                <AuthButton
+                  title={"Cancel Ride"}
+                  loading={loading2}
+                  handlePress={CancelOrder}
+                />
+              )}
             </View>
           </View>
         )}
-
       </SafeAreaView>
     </ImageBackground>
   );
@@ -524,5 +567,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     color: "#fff",
     gap: 10,
+  },
+  loader2: {
+    width: 200,
+    height: 200,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    borderRadius: 100,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

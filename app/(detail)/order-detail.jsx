@@ -1,11 +1,10 @@
 import {
-  FlatList,
-  Image,
+  Alert,
   ImageBackground,
+  Linking,
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   ToastAndroid,
   TouchableOpacity,
   View,
@@ -19,54 +18,64 @@ import AuthButton from "../../components/AuthButton";
 import { router, useLocalSearchParams } from "expo-router";
 import Fontisto from "@expo/vector-icons/Fontisto";
 import { useDispatch, useSelector } from "react-redux";
-import { AcceptOrderAPI } from "../../api/order";
+import { CancelOrderAfterAPI, CancelOrderAPI } from "../../api/order";
 
-const detail = () => {
-  const {
-    name,
-    rating,
-    order,
-    price,
-    pickup,
-    drop,
-    way,
-    returnPickup,
-    returnDrop,
-    dropDate,
-    pickupDate,
-    modelName,
-    order_id,
-    driver_id,
-  } = useLocalSearchParams();
-
+const orderdetail = () => {
   const { user } = useSelector((state) => state.user);
+  const { order } = useSelector((state) => state.order);
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
 
-  const CreateOrder = async () => {
-    try {
-      setLoading(true);
-      const result = await AcceptOrderAPI(
-        order_id,
-        driver_id,
-        user?._id,
-        user?._name
-      );
-      console.log(driver_id)
-      if (result?.data?.data) {
-        ToastAndroid.show(
-          "Your ride has been successfully booked. Thank you for choosing Mr. Cuban for your travel needs.",
-          ToastAndroid.SHORT
-        );
-        dispatch({ type: "deleteOrder", payload: false });
-        router.replace("/history");
+  const CancelOrder = async () => {
+    Alert.alert(
+      "Cancel Ride", // Title of the alert
+      "Are you sure you want to cancel this ride?", // Message
+      [
+        {
+          text: "No",
+          onPress: () => console.log("Ride cancellation aborted"), // If "No" is pressed
+          style: "cancel",
+        },
+        {
+          text: "Yes",
+          onPress: async () => {
+            try {
+              setLoading(true);
+              const result = await CancelOrderAfterAPI(
+                order?._id,
+                order?.driverOrderId
+              );
+              if (result?.data?.data) {
+                dispatch({ type: "deleteOrder", payload: false });
+                ToastAndroid.show(
+                  "Ride canceled successfully 🚗",
+                  ToastAndroid.SHORT
+                );
+                router.push("/history");
+              }
+            } catch (error) {
+              console.log(error);
+            } finally {
+              setLoading(false);
+            }
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  };
 
-      }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
+  const dialPhoneNumber = (number) => {
+    const url = `tel:${number}`;
+    Linking.canOpenURL(url)
+      .then((supported) => {
+        if (supported) {
+          return Linking.openURL(url);
+        } else {
+          Alert.alert("Error", "Unable to open dialer on this device.");
+        }
+      })
+      .catch((err) => console.error("Failed to open dialer:", err));
   };
 
   return (
@@ -75,23 +84,13 @@ const detail = () => {
       style={{ flex: 1, justifyContent: "center" }}
       resizeMode="cover"
     >
-      <SafeAreaView style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.5)" }}>
-        <View style={styles.back}>
-          <TouchableOpacity onPress={() => router.back()}>
-            <Ionicons
-              name="arrow-back-circle"
-              size={34}
-              color={colors.primary}
-            />
-          </TouchableOpacity>
-        </View>
-
+      <SafeAreaView style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.8)" }}>
         <View style={styles.door}>
           <ScrollView
             contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }}
           >
             <View style={styles.wrap}>
-              <Text style={styles.text}>Confirmation Order</Text>
+              <Text style={styles.text}>Ride Details</Text>
               <View style={styles.otp}>
                 <Text style={styles.otptext}>
                   {String(user?.accountOtp)[0]}
@@ -107,72 +106,102 @@ const detail = () => {
                 </Text>
               </View>
             </View>
+
             <View style={styles.profile}>
               <View style={styles.icon}>
-                <Text style={{ color: "#fff", fontWeight: 600, fontSize: 20 }}>
-                  {name[0]}
+                <Text
+                  style={{
+                    color: "#fff",
+                    fontWeight: 600,
+                    fontSize: 20,
+                    textTransform: "capitalize",
+                  }}
+                >
+                  {String(order?.driver[0]?.name)[0] || "G"}
                 </Text>
               </View>
               <View style={styles.content}>
                 <Text style={{ color: "#fff", fontWeight: 600, fontSize: 20 }}>
-                  {name}
+                  {order?.driver[0]?.name}
                 </Text>
                 <View style={styles.rate}>
                   <Text style={styles.star}>
                     <Fontisto name="star" size={12} color={colors.primary} />{" "}
-                    {rating}+
+                    {order?.driver[0]?.rating || 0}+
                   </Text>
-                  <Text style={styles.order}>{order} Orders</Text>
+                  <Text style={styles.order}>
+                    {order?.driver[0]?.orders || 0} Orders
+                  </Text>
                 </View>
               </View>
             </View>
 
             <View style={styles.form}>
               <Text style={styles.label}>Model Name</Text>
-              <Text style={styles.text1}>{modelName}</Text>
+              <Text style={styles.text1}>{order?.driver[0]?.model || ""}</Text>
             </View>
             <View style={styles.form}>
               <Text style={styles.label}>Round Trip</Text>
               <Text style={styles.text1}>
-                {way === "Round Trip" ? "Yes" : "No"}
+                {order?.type === "Round Trip" ? "Yes" : "No"}
               </Text>
             </View>
             <View style={styles.form}>
               <Text style={styles.label}>Total Price</Text>
-              <Text style={styles.text1}>₹{price}</Text>
+              <Text style={styles.text1}>₹{order?.price}</Text>
+            </View>
+            <View style={styles.form}>
+              <Text style={styles.label}>Contact Number</Text>
+              <TouchableOpacity onPress={() => Linking.openURL(`tel:${order?.driver[0]?.phone}`)}>
+                <Text style={{ fontSize: 16, color: colors.primary }}>
+                  {order?.driver[0]?.phone || "-"}
+                </Text>
+              </TouchableOpacity>
             </View>
             <View style={styles.form}>
               <Text style={styles.label}>Pickup Location</Text>
-              <Text style={styles.text1}>{pickup}</Text>
+              <Text style={styles.text1}>{order?.distance1}</Text>
             </View>
             <View style={styles.form}>
               <Text style={styles.label}>Drop Location</Text>
-              <Text style={styles.text1}>{drop}</Text>
+              <Text style={styles.text1}>{order?.distance2}</Text>
             </View>
             <View style={styles.form}>
               <Text style={styles.label}>Pickup Time</Text>
-              <Text style={styles.text1}>{pickupDate}</Text>
+              <Text style={styles.text1}>{order?.date1}</Text>
             </View>
-            {way === "Round Trip" && (
+            {order?.type === "Round Trip" && (
               <>
                 <View style={styles.form}>
                   <Text style={styles.label}>Return Pickup Location</Text>
-                  <Text style={styles.text1}>{returnPickup}</Text>
+                  <Text style={styles.text1}>{order?.distance3}</Text>
                 </View>
 
                 <View style={styles.form}>
                   <Text style={styles.label}>Return Drop Location</Text>
-                  <Text style={styles.text1}>{returnDrop}</Text>
+                  <Text style={styles.text1}>{order?.distance4}</Text>
                 </View>
 
                 <View style={styles.form}>
                   <Text style={styles.label}>Return Time</Text>
-                  <Text style={styles.text1}>{dropDate}</Text>
+                  <Text style={styles.text1}>{order?.date2}</Text>
                 </View>
               </>
             )}
-            <AuthButton title={"Confirm Order"} loading={loading} handlePress={CreateOrder} />
-            <Text style={{ fontSize: 14, marginTop: 10, color: "#ccc",textAlign:"justify",lineHeight:20 }}>
+            <AuthButton
+              title={order?.status==="cancel"? "Canceled":"Cancel Order"}
+              loading={loading}
+              handlePress={()=>order?.status!=="cancel" && CancelOrder}
+            />
+            <Text
+              style={{
+                fontSize: 14,
+                marginTop: 10,
+                color: "#ccc",
+                textAlign: "justify",
+                lineHeight: 20,
+              }}
+            >
               Your ride is confirmed! Please share this OTP with the driver when
               they arrive to begin your ride: {user?.accountOtp}. For your
               safety, do not share the OTP until the driver is with you.
@@ -184,19 +213,15 @@ const detail = () => {
   );
 };
 
-export default detail;
+export default orderdetail;
 
 const styles = StyleSheet.create({
   door: {
     width: "100%",
     display: "flex",
-    backgroundColor: "rgba(0,0,0,0.9)",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
     padding: 20,
     bottom: 0,
-    height: "90%",
-    top: "10%",
+    flex: 1,
   },
   wrap: {
     width: "100%",

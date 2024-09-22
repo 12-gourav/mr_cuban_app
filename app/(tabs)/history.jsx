@@ -19,6 +19,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams } from "expo-router";
 import drivers from "../../constants/Driver";
 import orders from "../../constants/Order";
+import CurrentOrder from "../../components/CurrentOrder";
+import HistoryOrder from "../../components/HistoryOrder";
 
 const history = () => {
   const { pickup, drop, date, taxi } = useLocalSearchParams();
@@ -75,136 +77,8 @@ const history = () => {
 {
   state === "current" ?
 
-        <View style={styles.flat}>
-          <FlatList
-            data={orders}
-            showsHorizontalScrollIndicator={false}
-            renderItem={({ item, index }) => (
-              <BlurView
-                intensity={90}
-                style={{
-                  width: "100%",
-                  borderRadius: 10,
-                  padding: 20,
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 10,
-                  marginBottom: 20,
-                  overflow: "hidden",
-                }}
-                key={item?.price + index}
-              >
-                <View
-                  style={{ display: "flex", flexDirection: "row", gap: 10 }}
-                >
-                  <View style={styles.left}>
-                    <View style={styles.line}>
-                      <Text style={styles.h5}>Pickup Location</Text>
-                      <Text
-                        style={styles.h2}
-                        numberOfLines={1}
-                        ellipsizeMode="tail"
-                      >
-                        {item?.pickupAddress}
-                      </Text>
-                    </View>
-                    <View style={styles.line}>
-                      <Text style={styles.h5}>Drop Location</Text>
-                      <Text
-                        style={styles.h2}
-                        numberOfLines={1}
-                        ellipsizeMode="tail"
-                      >
-                        {item?.dropAddress}
-                      </Text>
-                    </View>
-                  </View>
-                  <View style={styles.right}>
-                    <Text style={styles.p3}> ₹{item.price}</Text>
-                  </View>
-                </View>
-                <View style={styles.status}>
-                  <Text style={styles.km}>{item?.distance}</Text>
-                  <Text
-                    style={item?.status === "complete" ? styles.g : styles.r}
-                  >
-                    {item?.status}
-                  </Text>
-                  <Text style={styles.km}>
-                    {new Date(item?.date)?.toLocaleDateString()}
-                  </Text>
-                </View>
-              </BlurView>
-            )}
-            horizontal={false}
-            showsVerticalScrollIndicator={false}
-          />
-        </View>:
-        <View style={styles.flat}>
-          <FlatList
-            data={orders}
-            showsHorizontalScrollIndicator={false}
-            renderItem={({ item, index }) => (
-              <BlurView
-                intensity={90}
-                style={{
-                  width: "100%",
-                  borderRadius: 10,
-                  padding: 20,
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 10,
-                  marginBottom: 20,
-                  overflow: "hidden",
-                }}
-                key={item?.price + index}
-              >
-                <View
-                  style={{ display: "flex", flexDirection: "row", gap: 10 }}
-                >
-                  <View style={styles.left}>
-                    <View style={styles.line}>
-                      <Text style={styles.h5}>Pickup Location </Text>
-                      <Text
-                        style={styles.h2}
-                        numberOfLines={1}
-                        ellipsizeMode="tail"
-                      >
-                        {item?.pickupAddress}
-                      </Text>
-                    </View>
-                    <View style={styles.line}>
-                      <Text style={styles.h5}>Drop Location</Text>
-                      <Text
-                        style={styles.h2}
-                        numberOfLines={1}
-                        ellipsizeMode="tail"
-                      >
-                        {item?.dropAddress}
-                      </Text>
-                    </View>
-                  </View>
-                  <View style={styles.right}>
-                    <Text style={styles.p3}> ₹{item.price}</Text>
-                  </View>
-                </View>
-                <View style={styles.status}>
-                  <Text style={styles.km}>{item?.distance}</Text>
-                  <Text
-                    style={item?.status === "complete" ? styles.g : styles.r}
-                  >
-                    {item?.status}
-                  </Text>
-                  <Text style={styles.km}>
-                    {new Date(item?.date)?.toLocaleDateString()}
-                  </Text>
-                </View>
-              </BlurView>
-            )}
-            horizontal={false}
-            showsVerticalScrollIndicator={false}
-          />
-        </View>
+       <CurrentOrder/>:
+        <HistoryOrder/>
 
 }
       </SafeAreaView>
