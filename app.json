@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "mrcuban",
+    "name": "MR Cuban",
     "scheme": "mrcuban",
     "slug": "mrcuban",
     "version": "1.0.0",
@@ -17,8 +17,12 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/icons.png",
+        "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#ffffff"
+      },
+      "notification": {
+        "icon": "./assets/icon.png",
+        "color": "#FF231F7C"
       },
       "package": "com.gourav_bajpai1212.mrcuban"
     },

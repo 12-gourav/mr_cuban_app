@@ -9,6 +9,7 @@ import {
   View,
   ImageBackground,
   ToastAndroid,
+  Alert,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { colors } from "../../assets/color";
@@ -21,22 +22,112 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useDispatch, useSelector } from "react-redux";
 import { CreateOrder } from "../../api/order";
+import * as Device from "expo-device";
+import * as Notifications from "expo-notifications";
+import Constants from "expo-constants";
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
+
+async function sendPushNotification(expoPushToken, title, body) {
+  const message = {
+    to: expoPushToken,
+    sound: "default",
+    title: title,
+    body: body,
+    data: { source: "MR Cuban", someData: "" }, // source added
+  };
+
+  await fetch("https://exp.host/--/api/v2/push/send", {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Accept-encoding": "gzip, deflate",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(message),
+  });
+}
+
+function handleRegistrationError(errorMessage) {
+  alert(errorMessage);
+  throw new Error(errorMessage);
+}
+
+async function registerForPushNotificationsAsync() {
+  if (Platform.OS === "android") {
+    Notifications.setNotificationChannelAsync("default", {
+      name: "MR Cuban Notifications", // Channel name for MR Cuban app
+      importance: Notifications.AndroidImportance.MAX, // Highest importance (sound and heads-up alert)
+      vibrationPattern: [0, 250, 250, 250], // Vibration pattern
+      lightColor: "#FF231F7C", // Custom LED color (on supported devices)
+      lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC, // Show notification content on lock screen
+      sound: "default", // Default notification sound
+      enableVibrate: true, // Enable vibration for the notification
+      enableLights: true, // Enable LED light for notifications
+      bypassDnd: true, // Allow notifications to bypass Do Not Disturb mode
+      showBadge: true,
+    });
+  }
+
+  if (Device.isDevice) {
+    const { status: existingStatus } =
+      await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== "granted") {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    if (finalStatus !== "granted") {
+      Alert.alert(
+        "Notification Permission Required",
+        "Notifications are required to create an order. Please allow notifications in settings.",
+        [{ text: "OK" }]
+      );
+      return;
+    }
+    const projectId =
+      Constants?.expoConfig?.extra?.eas?.projectId ??
+      Constants?.easConfig?.projectId;
+    if (!projectId) {
+      handleRegistrationError("Project ID not found");
+    }
+    try {
+      const pushTokenString = (
+        await Notifications.getExpoPushTokenAsync({
+          projectId,
+        })
+      ).data;
+      return pushTokenString;
+    } catch (e) {
+      handleRegistrationError(`${e}`);
+    }
+  } else {
+    handleRegistrationError("Must use physical device for push notifications");
+  }
+}
 
 const home = () => {
   const { user } = useSelector((state) => state.user);
   const { isOrder } = useSelector((state) => state.order);
+
+  const [expoPushToken, setExpoPushToken] = useState("");
+
   const [date, setDate] = useState(new Date(1598051730000));
   const [dropDate, setDropDate] = useState(new Date(1598051730000));
   const [mode, setMode] = useState("date");
   const [mode2, setMode2] = useState("date");
   const [show, setShow] = useState(false);
   const [show2, setShow2] = useState(false);
-  const [pickup, setPickup] = useState("Near Boby Guest House lalganj");
-  const [drop, setDrop] = useState("Mohanlalganh");
-  const [returnPickup, setReturnPickup] = useState(
-    "Near Boby Guest House lalganj"
-  );
-  const [returnDrop, setReturnDrop] = useState("Mohanlalganh");
+  const [pickup, setPickup] = useState("");
+  const [drop, setDrop] = useState("");
+  const [returnPickup, setReturnPickup] = useState("");
+  const [returnDrop, setReturnDrop] = useState("");
   const [taxi, setTaxi] = useState("");
   const [state, setState] = useState("One Way");
   const [loading, setLoading] = useState(false);
@@ -79,7 +170,6 @@ const home = () => {
     showMode("time");
   };
 
-  
   const handleRide = async () => {
     try {
       if (pickup === "")
@@ -106,11 +196,17 @@ const home = () => {
         dropDate,
         state,
         user?._id,
-        user?.otp
+        user?.accountOtp
       );
       if (result?.data?.data) {
         dispatch({ type: "createOrder", payload: true });
         ToastAndroid.show("Ride Request Creat🚗ed ", ToastAndroid.SHORT);
+        await sendPushNotification(
+          expoPushToken,
+          "New Ride Request Alert!",
+          "A new ride order has been created. Please check the 'Request Ride' section in the MRCUBAN Partner App to accept the ride."
+        );
+
         router.push({
           pathname: "/search",
           params: {
@@ -140,13 +236,17 @@ const home = () => {
 
   useEffect(() => {
     if (isOrder) {
-      ToastAndroid.show(
-        "Ride Request already Created 🚗 ? If you want to go back then first cancel your ride",
-        ToastAndroid.SHORT
-      );
       router.push("/search");
     }
   }, [isOrder]);
+
+  useEffect(() => {
+    registerForPushNotificationsAsync()
+      .then((token) => setExpoPushToken(token ?? ""))
+      .catch((error) => setExpoPushToken(`${error}`));
+
+    // Removed notification listeners for receiving notifications
+  }, []);
 
   return (
     <ImageBackground
