@@ -9,9 +9,10 @@ const AuthLayout = () => {
    <Stack>
     <Stack.Screen name='update-profile' options={{headerShown:false}}/>
     <Stack.Screen name='aboutus' options={{headerShown:false}}/>
-    
+    <Stack.Screen name='feedback' options={{headerShown:false}}/>
+
    </Stack>
-   <StatusBar backgroundColor="#161622" style="light"/>
+   <StatusBar backgroundColor="#000" style="light"/>
    </>
   )
 }

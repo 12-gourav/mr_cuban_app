@@ -21,13 +21,9 @@ const HistoryOrder = () => {
   const [loading, setLoading] = useState(false);
   const [current, setCurrent] = useState(1);
   const [total, setTotal] = useState(0);
-  const [isEndReached, setIsEndReached] = useState(false);
+  
 
   const dispatch = useDispatch();
-
-
-
-
 
   const FetchRides = async () => {
     try {
@@ -45,11 +41,8 @@ const HistoryOrder = () => {
   };
 
   useEffect(() => {
-    
     FetchRides();
-  }, [current,]);
-
-  console.log(state,"lll");
+  }, [current]);
 
   return (
     <View style={styles.flat}>
@@ -90,7 +83,6 @@ const HistoryOrder = () => {
                   marginBottom: 20,
                   overflow: "hidden",
                 }}
-             
               >
                 <View
                   style={{ display: "flex", flexDirection: "row", gap: 10 }}
@@ -145,7 +137,6 @@ const HistoryOrder = () => {
           )}
           horizontal={false}
           showsVerticalScrollIndicator={false}
-        
         />
       )}
     </View>

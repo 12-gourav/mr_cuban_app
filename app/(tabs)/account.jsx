@@ -20,6 +20,8 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StatusBar } from "expo-status-bar";
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+
 
 const accout = () => {
   const { user } = useSelector((state) => state.user);
@@ -125,6 +127,16 @@ const accout = () => {
             </TouchableOpacity>
             <TouchableOpacity
               style={{ width: "100%" }}
+              onPress={() => router.push("/feedback")}
+            >
+              <View style={styles.link}>
+                <FontAwesome5 name="comments" size={18} color="#fff" />
+                <Text style={styles.p}>Feedbacks</Text>
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={{ width: "100%" }}
               onPress={() =>
                 openPrivacyPolicy(
                   "https://www.privacypolicies.com/live/dfe8d4ff-f488-4761-8e2f-21fdc8b3052a"
@@ -138,8 +150,12 @@ const accout = () => {
             </TouchableOpacity>
             <TouchableOpacity
               style={{ width: "100%" }}
-              onPress={() => openPrivacyPolicy("https://www.mrcuban.in/contact")}
-              >
+              onPress={() =>
+                openPrivacyPolicy(
+                  "https://mrcuban-terms-conditions.netlify.app/"
+                )
+              }
+            >
               <View style={styles.link}>
                 <MaterialCommunityIcons
                   name="newspaper-variant-outline"
@@ -162,7 +178,6 @@ const accout = () => {
         </ScrollView>
 
         <StatusBar backgroundColor="#000" style="light" />
-
       </SafeAreaView>
     </ImageBackground>
   );

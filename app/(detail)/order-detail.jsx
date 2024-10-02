@@ -19,11 +19,14 @@ import Fontisto from "@expo/vector-icons/Fontisto";
 import { useDispatch, useSelector } from "react-redux";
 import { CancelOrderAfterAPI } from "../../api/order";
 import { StatusBar } from "expo-status-bar";
+import RatingModal from "../../components/RatingModal";
 
 const orderdetail = () => {
   const { user } = useSelector((state) => state.user);
   const { order } = useSelector((state) => state.order);
   const [loading, setLoading] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+
   const dispatch = useDispatch();
 
   const CancelOrder = async () => {
@@ -65,18 +68,7 @@ const orderdetail = () => {
     );
   };
 
-  const dialPhoneNumber = (number) => {
-    const url = `tel:${number}`;
-    Linking.canOpenURL(url)
-      .then((supported) => {
-        if (supported) {
-          return Linking.openURL(url);
-        } else {
-          Alert.alert("Error", "Unable to open dialer on this device.");
-        }
-      })
-      .catch((err) => console.error("Failed to open dialer:", err));
-  };
+ 
 
   return (
     <ImageBackground
@@ -138,7 +130,15 @@ const orderdetail = () => {
 
             <View style={styles.form}>
               <Text style={styles.label}>Model Name</Text>
-              <Text style={styles.text1}>{order?.driver[0]?.model?.model || ""}</Text>
+              <Text style={styles.text1}>
+                {order?.driver[0]?.model?.model || ""}
+              </Text>
+            </View>
+            <View style={styles.form}>
+              <Text style={styles.label}>Vichele Number</Text>
+              <Text style={styles.text1}>
+                {order?.driver[0]?.model?.modelNumber || ""}
+              </Text>
             </View>
             <View style={styles.form}>
               <Text style={styles.label}>Round Trip</Text>
@@ -192,11 +192,20 @@ const orderdetail = () => {
                 </View>
               </>
             )}
-            <AuthButton
-              title={order?.status === "cancel" ? "Canceled" : "Cancel Order"}
-              loading={loading}
-              handlePress={() => order?.status !== "cancel" && CancelOrder}
-            />
+
+            {order?.status === "complete" ? (
+              <AuthButton
+                title={"Give Feedback"}
+                handlePress={() => setModalVisible(true)}
+              />
+            ) : (
+              <AuthButton
+                title={order?.status === "cancel" ? "Canceled" : "Cancel Order"}
+                loading={loading}
+                handlePress={() => order?.status !== "cancel" && CancelOrder}
+              />
+            )}
+
             <Text
               style={{
                 fontSize: 14,
@@ -211,6 +220,15 @@ const orderdetail = () => {
               safety, do not share the OTP until the driver is with you.
             </Text>
           </ScrollView>
+
+          {modalVisible && (
+            <RatingModal
+              modalVisible={modalVisible}
+              setModalVisible={setModalVisible}
+              data={order}
+              id={user?._id}
+            />
+          )}
         </View>
 
         <StatusBar backgroundColor="#000" style="light" />
