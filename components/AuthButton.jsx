@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
   },
   p1: {
     color: "#fff",
-    fontFamily: "regular",
+    fontFamily: "bold",
     fontWeight: "regular",
     marginTop: 0,
     padding: 0,

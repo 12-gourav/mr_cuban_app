@@ -3,19 +3,18 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { colors } from "../../assets/color";
 import img from "../../assets/img/login.jpg";
-import AuthButton from "../../components/AuthButton";
-import { useSelector } from "react-redux";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import { StatusBar } from "expo-status-bar";
+
 
 const AboutUs = () => {
-  const { user } = useSelector((state) => state.user);
+  
 
   return (
     <ImageBackground
@@ -92,6 +91,8 @@ const AboutUs = () => {
             <Text style={styles.p}>Thank you for choosing Mr Cuban—your ride, your way.</Text>
           </View>
         </ScrollView>
+        <StatusBar backgroundColor="#000" style="light" />
+
       </SafeAreaView>
     </ImageBackground>
   );

@@ -3,6 +3,8 @@ import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { colors } from "../../assets/color";
 import img from "../../assets/img/offers.png";
+import { StatusBar } from "expo-status-bar";
+
 
 const Offers = () => {
   return (
@@ -37,7 +39,9 @@ const Offers = () => {
             style={{ width: 300, height: 300,objectFit:"contain", backgroundColor: "#000" }}
           />
         </View>
+
       </ScrollView>
+      <StatusBar backgroundColor="#000" style="light" />
     </SafeAreaView>
   );
 };

@@ -13,12 +13,12 @@ import React, { useState } from "react";
 import img from "../../assets/img/login.jpg";
 import { colors } from "../../assets/color";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import AuthButton from "../../components/AuthButton";
-import { router, useLocalSearchParams } from "expo-router";
+import { router } from "expo-router";
 import Fontisto from "@expo/vector-icons/Fontisto";
 import { useDispatch, useSelector } from "react-redux";
-import { CancelOrderAfterAPI, CancelOrderAPI } from "../../api/order";
+import { CancelOrderAfterAPI } from "../../api/order";
+import { StatusBar } from "expo-status-bar";
 
 const orderdetail = () => {
   const { user } = useSelector((state) => state.user);
@@ -152,7 +152,11 @@ const orderdetail = () => {
             </View>
             <View style={styles.form}>
               <Text style={styles.label}>Contact Number</Text>
-              <TouchableOpacity onPress={() => Linking.openURL(`tel:${order?.driver[0]?.phone}`)}>
+              <TouchableOpacity
+                onPress={() =>
+                  Linking.openURL(`tel:${order?.driver[0]?.phone}`)
+                }
+              >
                 <Text style={{ fontSize: 16, color: colors.primary }}>
                   {order?.driver[0]?.phone || "-"}
                 </Text>
@@ -189,9 +193,9 @@ const orderdetail = () => {
               </>
             )}
             <AuthButton
-              title={order?.status==="cancel"? "Canceled":"Cancel Order"}
+              title={order?.status === "cancel" ? "Canceled" : "Cancel Order"}
               loading={loading}
-              handlePress={()=>order?.status!=="cancel" && CancelOrder}
+              handlePress={() => order?.status !== "cancel" && CancelOrder}
             />
             <Text
               style={{
@@ -208,6 +212,8 @@ const orderdetail = () => {
             </Text>
           </ScrollView>
         </View>
+
+        <StatusBar backgroundColor="#000" style="light" />
       </SafeAreaView>
     </ImageBackground>
   );

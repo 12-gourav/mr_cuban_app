@@ -11,7 +11,8 @@ export const CreateOrder = async (
   dropdate,
   type,
   id,
-  otp
+  otp,
+  taxi
 ) => {
   try {
     return await axios.post(
@@ -26,6 +27,7 @@ export const CreateOrder = async (
         dropdate,
         id,
         otp,
+        seat:taxi
       },
       {
         headers: {
@@ -55,6 +57,7 @@ export const SearchOrders = async (id, token) => {
 
 export const CancelOrderAPI = async (id) => {
   try {
+    console.log(id)
     return await axios.get(`${url}/cancel/lead/customer`, {
       params:{
         id
@@ -141,6 +144,23 @@ export const GetHistoryOrdersAPI = async (page,id) => {
         id:id,
         page,
         limit:10
+      },
+      
+    });
+  } catch (error) {
+    console.log(error?.response);
+  }
+};
+
+
+
+
+export const SendPushNotification = async (title,message) => {
+  try {
+   
+    return await axios.get(`${url}/send/push/notification`, {
+      params:{
+        title,message
       },
       
     });

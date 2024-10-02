@@ -1,11 +1,9 @@
 import {
-  FlatList,
   Image,
   ImageBackground,
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   ToastAndroid,
   TouchableOpacity,
   View,
@@ -20,6 +18,8 @@ import { router, useLocalSearchParams } from "expo-router";
 import Fontisto from "@expo/vector-icons/Fontisto";
 import { useDispatch, useSelector } from "react-redux";
 import { AcceptOrderAPI } from "../../api/order";
+import { StatusBar } from "expo-status-bar";
+
 
 const detail = () => {
   const {
@@ -179,6 +179,8 @@ const detail = () => {
             </Text>
           </ScrollView>
         </View>
+        <StatusBar backgroundColor="#000" style="light" />
+
       </SafeAreaView>
     </ImageBackground>
   );

@@ -15,6 +15,8 @@ import AuthButton from "../../components/AuthButton";
 import { useDispatch, useSelector } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LoadApi, UpdateUserApi } from "../../api/auth";
+import { StatusBar } from "expo-status-bar";
+
 
 const accout = () => {
   const { user } = useSelector((state) => state.user);
@@ -119,6 +121,8 @@ const accout = () => {
             <AuthButton loading={loading} handlePress={handleUpdate} title={"Update Profile"} />
           </View>
         </ScrollView>
+        <StatusBar backgroundColor="#000" style="light" />
+
       </SafeAreaView>
     </ImageBackground>
   );

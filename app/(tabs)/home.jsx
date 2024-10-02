@@ -9,7 +9,6 @@ import {
   View,
   ImageBackground,
   ToastAndroid,
-  Alert,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { colors } from "../../assets/color";
@@ -21,102 +20,13 @@ import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useDispatch, useSelector } from "react-redux";
-import { CreateOrder } from "../../api/order";
-import * as Device from "expo-device";
-import * as Notifications from "expo-notifications";
-import Constants from "expo-constants";
-
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
-});
-
-async function sendPushNotification(expoPushToken, title, body) {
-  const message = {
-    to: expoPushToken,
-    sound: "default",
-    title: title,
-    body: body,
-    data: { source: "MR Cuban", someData: "" }, // source added
-  };
-
-  await fetch("https://exp.host/--/api/v2/push/send", {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Accept-encoding": "gzip, deflate",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(message),
-  });
-}
-
-function handleRegistrationError(errorMessage) {
-  alert(errorMessage);
-  throw new Error(errorMessage);
-}
-
-async function registerForPushNotificationsAsync() {
-  if (Platform.OS === "android") {
-    Notifications.setNotificationChannelAsync("default", {
-      name: "MR Cuban Notifications", // Channel name for MR Cuban app
-      importance: Notifications.AndroidImportance.MAX, // Highest importance (sound and heads-up alert)
-      vibrationPattern: [0, 250, 250, 250], // Vibration pattern
-      lightColor: "#FF231F7C", // Custom LED color (on supported devices)
-      lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC, // Show notification content on lock screen
-      sound: "default", // Default notification sound
-      enableVibrate: true, // Enable vibration for the notification
-      enableLights: true, // Enable LED light for notifications
-      bypassDnd: true, // Allow notifications to bypass Do Not Disturb mode
-      showBadge: true,
-    });
-  }
-
-  if (Device.isDevice) {
-    const { status: existingStatus } =
-      await Notifications.getPermissionsAsync();
-    let finalStatus = existingStatus;
-    if (existingStatus !== "granted") {
-      const { status } = await Notifications.requestPermissionsAsync();
-      finalStatus = status;
-    }
-    if (finalStatus !== "granted") {
-      Alert.alert(
-        "Notification Permission Required",
-        "Notifications are required to create an order. Please allow notifications in settings.",
-        [{ text: "OK" }]
-      );
-      return;
-    }
-    const projectId =
-      Constants?.expoConfig?.extra?.eas?.projectId ??
-      Constants?.easConfig?.projectId;
-    if (!projectId) {
-      handleRegistrationError("Project ID not found");
-    }
-    try {
-      const pushTokenString = (
-        await Notifications.getExpoPushTokenAsync({
-          projectId,
-        })
-      ).data;
-      return pushTokenString;
-    } catch (e) {
-      handleRegistrationError(`${e}`);
-    }
-  } else {
-    handleRegistrationError("Must use physical device for push notifications");
-  }
-}
+import { CreateOrder, SendPushNotification } from "../../api/order";
+import { StatusBar } from "expo-status-bar";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const home = () => {
   const { user } = useSelector((state) => state.user);
   const { isOrder } = useSelector((state) => state.order);
-
-  const [expoPushToken, setExpoPushToken] = useState("");
 
   const [date, setDate] = useState(new Date(1598051730000));
   const [dropDate, setDropDate] = useState(new Date(1598051730000));
@@ -186,7 +96,6 @@ const home = () => {
         return ToastAndroid.show("Car is required", ToastAndroid.SHORT);
 
       setLoading(true);
-
       const result = await CreateOrder(
         pickup,
         drop,
@@ -196,30 +105,19 @@ const home = () => {
         dropDate,
         state,
         user?._id,
-        user?.accountOtp
+        user?.accountOtp,
+        taxi
       );
       if (result?.data?.data) {
-        dispatch({ type: "createOrder", payload: true });
-        ToastAndroid.show("Ride Request Creat🚗ed ", ToastAndroid.SHORT);
-        await sendPushNotification(
-          expoPushToken,
-          "New Ride Request Alert!",
+        await SendPushNotification(
+          "New Ride Order Alert!",
           "A new ride order has been created. Please check the 'Request Ride' section in the MRCUBAN Partner App to accept the ride."
         );
-
+        dispatch({ type: "createOrder", payload: true });
+        ToastAndroid.show("Ride Request Creat🚗ed ", ToastAndroid.SHORT);
+        await AsyncStorage.setItem("orderId", result?.data?.data?._id);
         router.push({
           pathname: "/search",
-          params: {
-            pickup: pickup,
-            drop: drop,
-            date: date,
-            dropDate: dropDate,
-            taxi: taxi,
-            way: state,
-            returnPickup: returnPickup,
-            returnDrop: returnDrop,
-            id: user?._id,
-          },
         });
       } else {
         ToastAndroid.show(
@@ -241,11 +139,9 @@ const home = () => {
   }, [isOrder]);
 
   useEffect(() => {
-    registerForPushNotificationsAsync()
-      .then((token) => setExpoPushToken(token ?? ""))
-      .catch((error) => setExpoPushToken(`${error}`));
-
-    // Removed notification listeners for receiving notifications
+    const newTimestamp = Date.now();
+    setDate(new Date(newTimestamp));
+    setDropDate(new Date(newTimestamp));
   }, []);
 
   return (
@@ -418,12 +314,14 @@ const home = () => {
                   data={car}
                   renderItem={({ item }) => (
                     <TouchableOpacity
-                      onPress={() => setTaxi(item.model)}
+                      onPress={() => setTaxi(item.seatCapacity)}
                       key={item?.model}
                     >
                       <View
                         style={
-                          taxi === item?.model ? styles.card2 : styles.card
+                          taxi === item?.seatCapacity
+                            ? styles.card2
+                            : styles.card
                         }
                       >
                         <Image
@@ -455,6 +353,7 @@ const home = () => {
               handlePress={() => handleRide()}
             />
           </View>
+          <StatusBar backgroundColor="#000" style="light" />
         </ScrollView>
       </SafeAreaView>
       {show && (

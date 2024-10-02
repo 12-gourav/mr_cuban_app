@@ -37,7 +37,7 @@ const search = () => {
   const [state, setState] = useState();
   const [rides, setRides] = useState([]);
   const [rideLoading, setRideLoading] = useState(false);
-  const [total,setTotal] = useState(0)
+
   const router = useRouter();
   const dispatch = useDispatch();
 
@@ -62,7 +62,7 @@ const search = () => {
   const CancelOrder = async () => {
     try {
       setLoading2(true);
-      const id = state?._id;
+      const id = await AsyncStorage.getItem("orderId");
       const result = await CancelOrderAPI(id);
       if (result?.data?.data) {
         dispatch({ type: "deleteOrder", payload: false });
@@ -80,7 +80,20 @@ const search = () => {
     if (isOrder) {
       Alert.alert(
         "Cancel Order",
-        "You must cancel your order before leaving the screen."
+        "You must cancel your order before leaving the screen.",
+        [
+          {
+            text: "Cancel",
+            onPress: () => CancelOrder(),
+            style: "cancel",
+          },
+          {
+            text: "OK",
+            onPress: () => {},
+            style: "destructive",
+          },
+        ],
+        { cancelable: false }
       );
       return true;
     }
@@ -102,10 +115,9 @@ const search = () => {
     try {
       setRideLoading(true);
       const result = await GetRidesAPI(state?._id);
-    
+
       if (result?.data?.data) {
         setRides(result?.data?.data?.drivers);
-
       }
     } catch (error) {
       console.log(error);
@@ -115,11 +127,10 @@ const search = () => {
   };
 
   useEffect(() => {
-    if (state?._id ) {
+    if (state?._id) {
       const intervalId = setInterval(() => {
-     
         fetchRides();
-      },10000); // 5 seconds in milliseconds
+      }, 10000); // 5 seconds in milliseconds
 
       // Cleanup interval on component unmount
       return () => clearInterval(intervalId);
@@ -131,8 +142,6 @@ const search = () => {
       SearchRides();
     }
   }, [isOrder]);
-
-
 
   return (
     <ImageBackground
@@ -290,10 +299,21 @@ const search = () => {
 
             <View style={styles.flat}>
               {rides?.length === 0 ? (
-                <View style={{flex:1,display:"flex",justifyContent:"center",alignItems:"center"}}>
-                <View style={styles.loader2}>
-                  <Image resizeMode="contain" style={{width:"100%",height:"100%"}} source={img3} />
-                </View>
+                <View
+                  style={{
+                    flex: 1,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <View style={styles.loader2}>
+                    <Image
+                      resizeMode="contain"
+                      style={{ width: "100%", height: "100%" }}
+                      source={img3}
+                    />
+                  </View>
                 </View>
               ) : (
                 <FlatList
@@ -314,11 +334,13 @@ const search = () => {
                             way: state?.trip_type,
                             returnPickup: state?.return_pickup_address,
                             returnDrop: state?.return_drop_address,
-                            dropDate: state?.return_date +" | " +state?.return_time,
-                            pickupDate: state?.pickup_date + " | "+state?.pickup_time,
+                            dropDate:
+                              state?.return_date + " | " + state?.return_time,
+                            pickupDate:
+                              state?.pickup_date + " | " + state?.pickup_time,
                             modelName: item?.model,
-                            order_id:state?._id,
-                            driver_id:item?.id
+                            order_id: state?._id,
+                            driver_id: item?.id,
                           },
                         })
                       }

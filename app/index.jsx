@@ -81,7 +81,7 @@ const RooyLayout = () => {
           </View>
         )}
       </ScrollView>
-      <StatusBar backgroundColor="#161622" style="light" />
+      <StatusBar backgroundColor="#000" style="light" />
     </SafeAreaView>
   );
 };
@@ -115,10 +115,9 @@ const styles = StyleSheet.create({
   },
   p: {
     color: "#fff",
-    textAlign: "center",
-    fontSize: 16,
+    textAlign: "justify",
+    fontSize: 14,
     fontFamily: "regular",
-    lineHeight: 22,
     marginTop: 10,
   },
   loader:{

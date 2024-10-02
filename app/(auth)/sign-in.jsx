@@ -82,14 +82,6 @@ const SignIn = () => {
 
 
 
-
-console.log(isValid,"ssss")
-
-
-
-
-
-
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Image
@@ -168,7 +160,7 @@ console.log(isValid,"ssss")
         <AuthButton loading={loading} title="Login" handlePress={() => handleLogin()} />
       </View>
 
-      <StatusBar backgroundColor="#161622" style="light" />
+      <StatusBar backgroundColor="#000" style="light" />
     </SafeAreaView>
   );
 };

@@ -19,17 +19,17 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { StatusBar } from "expo-status-bar";
 
 const accout = () => {
   const { user } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
-  const openPrivacyPolicy = async () => {
-    const url = "https://your-privacy-policy-url.com"; 
+  const openPrivacyPolicy = async (url) => {
     const supported = await Linking.canOpenURL(url);
 
     if (supported) {
-      await Linking.openURL(url); 
+      await Linking.openURL(url);
     } else {
       Alert.alert("Error", "Don't know how to open this URL: " + url);
     }
@@ -41,10 +41,6 @@ const accout = () => {
     router.push("/");
   };
 
-
-
-
-
   const confirmLogout = () => {
     Alert.alert(
       "Logout",
@@ -53,22 +49,16 @@ const accout = () => {
         {
           text: "Cancel",
           onPress: () => console.log("Logout cancelled"),
-          style: "cancel"
+          style: "cancel",
         },
         {
           text: "Yes",
           onPress: () => handleLogout(),
-        }
+        },
       ],
       { cancelable: false }
     );
   };
-
-
-
-
-
-
 
   return (
     <ImageBackground
@@ -133,32 +123,46 @@ const accout = () => {
                 <Text style={styles.p}>About App</Text>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity style={{width:"100%"}} onPress={() => openPrivacyPolicy()}>
+            <TouchableOpacity
+              style={{ width: "100%" }}
+              onPress={() =>
+                openPrivacyPolicy(
+                  "https://www.privacypolicies.com/live/dfe8d4ff-f488-4761-8e2f-21fdc8b3052a"
+                )
+              }
+            >
               <View style={styles.link}>
                 <MaterialIcons name="policy" size={18} color="#fff" />
                 <Text style={styles.p}>Privacy Policy</Text>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity style={{width:"100%"}} onPress={() => openPrivacyPolicy()}>
-            <View style={styles.link}>
-              <MaterialCommunityIcons
-                name="newspaper-variant-outline"
-                size={24}
-                color="#fff"
-              />
-              <Text style={styles.p}>Terms & Conditions</Text>
-            </View>
-
+            <TouchableOpacity
+              style={{ width: "100%" }}
+              onPress={() => openPrivacyPolicy("https://www.mrcuban.in/contact")}
+              >
+              <View style={styles.link}>
+                <MaterialCommunityIcons
+                  name="newspaper-variant-outline"
+                  size={24}
+                  color="#fff"
+                />
+                <Text style={styles.p}>Terms & Conditions</Text>
+              </View>
             </TouchableOpacity>
-           <TouchableOpacity onPress={()=>confirmLogout()} style={{width:"100%"}}>
-           <View style={styles.link}>
-              <MaterialCommunityIcons name="logout" size={24} color="#fff" />
-              <Text style={styles.p}>Logout</Text>
-            </View>
-           </TouchableOpacity>
-            
+            <TouchableOpacity
+              onPress={() => confirmLogout()}
+              style={{ width: "100%" }}
+            >
+              <View style={styles.link}>
+                <MaterialCommunityIcons name="logout" size={24} color="#fff" />
+                <Text style={styles.p}>Logout</Text>
+              </View>
+            </TouchableOpacity>
           </View>
         </ScrollView>
+
+        <StatusBar backgroundColor="#000" style="light" />
+
       </SafeAreaView>
     </ImageBackground>
   );
