@@ -138,7 +138,7 @@ const orderdetail = () => {
 
             <View style={styles.form}>
               <Text style={styles.label}>Model Name</Text>
-              <Text style={styles.text1}>{order?.driver[0]?.model || ""}</Text>
+              <Text style={styles.text1}>{order?.driver[0]?.model?.model || ""}</Text>
             </View>
             <View style={styles.form}>
               <Text style={styles.label}>Round Trip</Text>

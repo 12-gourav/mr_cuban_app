@@ -35,6 +35,7 @@ const detail = () => {
     dropDate,
     pickupDate,
     modelName,
+    modelNumber,
     order_id,
     driver_id,
   } = useLocalSearchParams();
@@ -68,6 +69,8 @@ const detail = () => {
       setLoading(false);
     }
   };
+
+  
 
   return (
     <ImageBackground
@@ -129,7 +132,11 @@ const detail = () => {
 
             <View style={styles.form}>
               <Text style={styles.label}>Model Name</Text>
-              <Text style={styles.text1}>{modelName}</Text>
+              <Text style={styles.text1}>{modelName}iii</Text>
+            </View>
+            <View style={styles.form}>
+              <Text style={styles.label}>Model Name</Text>
+              <Text style={styles.text1}>{modelNumber}iii</Text>
             </View>
             <View style={styles.form}>
               <Text style={styles.label}>Round Trip</Text>
@@ -172,7 +179,7 @@ const detail = () => {
               </>
             )}
             <AuthButton title={"Confirm Order"} loading={loading} handlePress={CreateOrder} />
-            <Text style={{ fontSize: 14, marginTop: 10, color: "#ccc",textAlign:"justify",lineHeight:20 }}>
+            <Text style={{ fontSize: 14, marginTop: 10, color: "#ccc",textAlign:"justify",lineHeight:20,marginBottom:20 }}>
               Your ride is confirmed! Please share this OTP with the driver when
               they arrive to begin your ride: {user?.accountOtp}. For your
               safety, do not share the OTP until the driver is with you.

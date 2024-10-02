@@ -143,6 +143,10 @@ const search = () => {
     }
   }, [isOrder]);
 
+
+  console.log(rides)
+
+
   return (
     <ImageBackground
       source={img}
@@ -338,7 +342,8 @@ const search = () => {
                               state?.return_date + " | " + state?.return_time,
                             pickupDate:
                               state?.pickup_date + " | " + state?.pickup_time,
-                            modelName: item?.model,
+                            modelName: item?.model?.model,
+                            modelNumber:item?.model?.modelNumber,
                             order_id: state?._id,
                             driver_id: item?.id,
                           },
@@ -416,7 +421,7 @@ const search = () => {
                               <Text>
                                 Model Name:{" "}
                                 <Text style={{ color: "white" }}>
-                                  {item.model}
+                                  {item.model?.model}
                                 </Text>
                               </Text>
                             </Text>
