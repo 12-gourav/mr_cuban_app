@@ -132,11 +132,11 @@ const detail = () => {
 
             <View style={styles.form}>
               <Text style={styles.label}>Model Name</Text>
-              <Text style={styles.text1}>{modelName}iii</Text>
+              <Text style={styles.text1}>{modelName}</Text>
             </View>
             <View style={styles.form}>
-              <Text style={styles.label}>Model Name</Text>
-              <Text style={styles.text1}>{modelNumber}iii</Text>
+              <Text style={styles.label}>Model Number</Text>
+              <Text style={styles.text1}>{modelNumber}</Text>
             </View>
             <View style={styles.form}>
               <Text style={styles.label}>Round Trip</Text>

@@ -282,7 +282,7 @@ const home = () => {
               />
             </View>
 
-            {state === "Round Trip" && (
+            {/* {state === "Round Trip" && (
               <>
                 <View style={styles.group}>
                   <Text style={styles.label}>Return Pickup Address</Text>
@@ -305,7 +305,7 @@ const home = () => {
                   />
                 </View>
               </>
-            )}
+            )} */}
 
             <View style={styles.group}>
               <Text style={styles.label}>Select Car</Text>

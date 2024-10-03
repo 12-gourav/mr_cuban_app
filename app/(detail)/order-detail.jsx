@@ -68,7 +68,6 @@ const orderdetail = () => {
     );
   };
 
- 
 
   return (
     <ImageBackground
@@ -202,7 +201,7 @@ const orderdetail = () => {
               <AuthButton
                 title={order?.status === "cancel" ? "Canceled" : "Cancel Order"}
                 loading={loading}
-                handlePress={() => order?.status !== "cancel" && CancelOrder}
+                handlePress={() => order?.status !== "cancel" && CancelOrder()}
               />
             )}
 
