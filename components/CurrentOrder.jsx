@@ -129,7 +129,7 @@ const CurrentOrder = () => {
                       ? "In Progress"
                       : item?.status === "complete"
                       ? "Complete"
-                      : "Cancel"}
+                      : item?.status==="start" ? "Start": "Cancel"}
                   </Text>
                   <Text style={styles.km}>{item?.date1?.split(" ")[0]}</Text>
                 </View>

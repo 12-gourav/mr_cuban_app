@@ -345,11 +345,11 @@ const home = () => {
             )} */}
 
             <View style={styles.group}>
-              <Text style={styles.label}>One Way Distance (aprox)</Text>
+              <Text style={styles.label}>One Way Distance (Aprox)</Text>
               <TextInput
                 value={km}
                 style={styles.input}
-                placeholder="Enter Pickup Address"
+                placeholder="Enter Distance"
                 placeholderTextColor={"gray"}
                 onChangeText={(e) => setKm(e)}
               />
