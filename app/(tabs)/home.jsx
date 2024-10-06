@@ -47,6 +47,7 @@ const home = () => {
   const [taxi, setTaxi] = useState("");
   const [state, setState] = useState("One Way");
   const [loading, setLoading] = useState(false);
+  const [km, setKm] = useState("");
 
   const [viceles, setVicheles] = useState([]);
   const [vloading, setVloading] = useState(false);
@@ -102,6 +103,11 @@ const home = () => {
           "Drop address is required",
           ToastAndroid.SHORT
         );
+      if (km === "")
+        return ToastAndroid.show(
+          "One way distance is required",
+          ToastAndroid.SHORT
+        );
       if (taxi === "")
         return ToastAndroid.show("Car is required", ToastAndroid.SHORT);
 
@@ -116,12 +122,14 @@ const home = () => {
         state,
         user?._id,
         user?.accountOtp,
-        taxi
+        taxi,
+        km
       );
       if (result?.data?.data) {
         await SendPushNotification(
           "New Ride Order Alert!",
-          "A new ride order has been created. Please check the 'Request Ride' section in the MRCUBAN Partner App to accept the ride."
+          "A new ride order has been created. Please check the 'Request Ride' section in the MRCUBAN Partner App to accept the ride.",
+          taxi
         );
         dispatch({ type: "createOrder", payload: true });
         ToastAndroid.show("Ride Request Creat🚗ed ", ToastAndroid.SHORT);
@@ -337,6 +345,17 @@ const home = () => {
             )} */}
 
             <View style={styles.group}>
+              <Text style={styles.label}>One Way Distance (aprox)</Text>
+              <TextInput
+                value={km}
+                style={styles.input}
+                placeholder="Enter Pickup Address"
+                placeholderTextColor={"gray"}
+                onChangeText={(e) => setKm(e)}
+              />
+            </View>
+
+            <View style={styles.group}>
               <Text style={styles.label}>Select Car</Text>
               {vloading ? (
                 <View style={styles.slider}>
@@ -366,9 +385,7 @@ const home = () => {
                       >
                         <View
                           style={
-                            taxi === item?.seat
-                              ? styles.card2
-                              : styles.card
+                            taxi === item?.seat ? styles.card2 : styles.card
                           }
                         >
                           <Image
@@ -397,7 +414,7 @@ const home = () => {
                 </View>
               )}
             </View>
-          
+
             <AuthButton
               loading={loading}
               title={"Book  Ride"}
