@@ -57,10 +57,8 @@ const SignUp = () => {
       setLoading(true);
       const result = await RegisterApi(name, email, phone, password);
       if (result?.data?.data) {
-        AsyncStorage.setItem("token", result?.data?.token);
-        dispatch({ type: "login", payload: result?.data?.data });
-        ToastAndroid.show("Registration Successfull", ToastAndroid.SHORT);
-        router.push("/home")
+        ToastAndroid.show("OTP send to your register email address", ToastAndroid.SHORT);
+        router.push({pathname:"/verify",params:{email:email}})
       } else {
         ToastAndroid.show("Registration Failed", ToastAndroid.SHORT);
       }

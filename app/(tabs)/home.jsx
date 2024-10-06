@@ -9,6 +9,7 @@ import {
   View,
   ImageBackground,
   ToastAndroid,
+  ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { colors } from "../../assets/color";
@@ -20,13 +21,18 @@ import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useDispatch, useSelector } from "react-redux";
-import { CreateOrder, SendPushNotification } from "../../api/order";
+import {
+  CreateOrder,
+  GetVicheles,
+  SendPushNotification,
+} from "../../api/order";
 import { StatusBar } from "expo-status-bar";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const home = () => {
   const { user } = useSelector((state) => state.user);
   const { isOrder } = useSelector((state) => state.order);
+  const { car } = useSelector((state) => state.car);
 
   const [date, setDate] = useState(new Date(1598051730000));
   const [dropDate, setDropDate] = useState(new Date(1598051730000));
@@ -41,6 +47,10 @@ const home = () => {
   const [taxi, setTaxi] = useState("");
   const [state, setState] = useState("One Way");
   const [loading, setLoading] = useState(false);
+
+  const [viceles, setVicheles] = useState([]);
+  const [vloading, setVloading] = useState(false);
+
   const dispatch = useDispatch();
 
   const onChange = (event, selectedDate) => {
@@ -131,6 +141,25 @@ const home = () => {
       setLoading(false);
     }
   };
+
+  const fetcRides = async () => {
+    try {
+      setVloading(true);
+      const result = await GetVicheles();
+      if (result?.data?.data) {
+        dispatch({ type: "addCar", payload: result?.data?.data });
+        setVicheles(result?.data?.data);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setVloading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (car?.length === 0) fetcRides();
+  }, [car]);
 
   useEffect(() => {
     if (isOrder) {
@@ -309,44 +338,66 @@ const home = () => {
 
             <View style={styles.group}>
               <Text style={styles.label}>Select Car</Text>
-              <View style={styles.slider}>
-                <FlatList
-                  data={car}
-                  renderItem={({ item }) => (
-                    <TouchableOpacity
-                      onPress={() => setTaxi(item.seatCapacity)}
-                      key={item?.model}
-                    >
-                      <View
-                        style={
-                          taxi === item?.seatCapacity
-                            ? styles.card2
-                            : styles.card
-                        }
+              {vloading ? (
+                <View style={styles.slider}>
+                  <FlatList
+                    data={[1, 2, 3]}
+                    renderItem={({ item }) => (
+                      <View style={styles.card3} key={item}>
+                        <ActivityIndicator size={"small"} color={"#fff"} />
+                      </View>
+                    )}
+                    keyExtractor={(item) => item?.model}
+                    horizontal={true}
+                    showsHorizontalScrollIndicator={false}
+                    ItemSeparatorComponent={() => (
+                      <View style={{ width: 10 }} />
+                    )}
+                  />
+                </View>
+              ) : (
+                <View style={styles.slider}>
+                  <FlatList
+                    data={car}
+                    renderItem={({ item }) => (
+                      <TouchableOpacity
+                        onPress={() => setTaxi(item.seat)}
+                        key={item?.model}
                       >
-                        <Image
-                          style={{ width: 100, marginBottom: 5 }}
-                          resizeMode="contain"
-                          source={img}
-                        />
-                        <Text
+                        <View
                           style={
-                            taxi === item?.model ? styles.name2 : styles.name
+                            taxi === item?.seat
+                              ? styles.card2
+                              : styles.card
                           }
                         >
-                          {" "}
-                          {item?.model}
-                        </Text>
-                      </View>
-                    </TouchableOpacity>
-                  )}
-                  keyExtractor={(item) => item?.model}
-                  horizontal={true}
-                  showsHorizontalScrollIndicator={false}
-                  ItemSeparatorComponent={() => <View style={{ width: 10 }} />}
-                />
-              </View>
+                          <Image
+                            style={{ width: 100, marginBottom: 5 }}
+                            resizeMode="contain"
+                            source={img}
+                          />
+                          <Text
+                            style={
+                              taxi === item?.seat ? styles.name2 : styles.name
+                            }
+                          >
+                            {" "}
+                            {item?.seat} Seater
+                          </Text>
+                        </View>
+                      </TouchableOpacity>
+                    )}
+                    keyExtractor={(item) => item?.model}
+                    horizontal={true}
+                    showsHorizontalScrollIndicator={false}
+                    ItemSeparatorComponent={() => (
+                      <View style={{ width: 10 }} />
+                    )}
+                  />
+                </View>
+              )}
             </View>
+          
             <AuthButton
               loading={loading}
               title={"Book  Ride"}
@@ -465,6 +516,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderWidth: 2,
     borderColor: colors.primary,
+  },
+  card3: {
+    backgroundColor: "rgba(0,0,0,0.8)",
+    width: 200,
+    height: 100,
+    borderRadius: 5,
+    padding: 10,
+    color: "#fff",
+    alignItems: "center",
+    borderWidth: 2,
+    justifyContent: "center",
   },
   dis: {
     color: "#fff",

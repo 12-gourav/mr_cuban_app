@@ -178,3 +178,19 @@ export const GetCommentAPI = async (id) => {
     console.log(error?.response);
   }
 };
+
+
+
+
+export const GetVicheles = async () => {
+  try {
+  
+    return await axios.get(`${url}/vichele`, {
+      params: {
+        
+      },
+    });
+  } catch (error) {
+    console.log(error?.response);
+  }
+};

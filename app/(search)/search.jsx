@@ -38,6 +38,10 @@ const search = () => {
   const [rides, setRides] = useState([]);
   const [rideLoading, setRideLoading] = useState(false);
 
+  const [countDown,setCountDown] = useState(120);
+
+
+
   const router = useRouter();
   const dispatch = useDispatch();
 
@@ -115,7 +119,6 @@ const search = () => {
     try {
       setRideLoading(true);
       const result = await GetRidesAPI(state?._id);
-
       if (result?.data?.data) {
         setRides(result?.data?.data?.drivers);
       }
@@ -126,16 +129,44 @@ const search = () => {
     }
   };
 
-  useEffect(() => {
-    if (state?._id) {
-      const intervalId = setInterval(() => {
-        fetchRides();
-      }, 10000); // 5 seconds in milliseconds
+ 
+   
+   
+   
+   
+   useEffect(() => {
+    let intervalId;
+    let apiCallIntervalId;
 
-      // Cleanup interval on component unmount
-      return () => clearInterval(intervalId);
+    // Start countdown timer when the component loads
+    if (isOrder) {
+      intervalId = setInterval(() => {
+        setCountDown((prev) => {
+          if (prev === 0) {
+            clearInterval(intervalId); 
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000); // Countdown every second
+
+      // Once countdown reaches 0, start calling the API every 10 seconds
+      if (countDown === 0) {
+        apiCallIntervalId = setInterval(() => {
+          fetchRides();
+        }, 10000); // 10 seconds in milliseconds
+      }
     }
-  }, [state?._id]);
+
+    // Cleanup intervals when the component unmounts
+    return () => {
+      clearInterval(intervalId);
+      clearInterval(apiCallIntervalId);
+    };
+  }, [isOrder, countDown]); // Re-run effect when countdown or order changes
+
+
+
 
   useEffect(() => {
     if (isOrder) {
@@ -144,7 +175,7 @@ const search = () => {
   }, [isOrder]);
 
 
-  console.log(rides)
+
 
 
   return (
@@ -280,12 +311,12 @@ const search = () => {
               <Text
                 style={{
                   color: "#fff",
-                  fontSize: 25,
+                  fontSize: 22,
                   fontWeight: 600,
                   fontFamily: "regular",
                 }}
               >
-                List of Rides
+                List of Rides <Text style={{color:colors.primary,fontSize:20}}>({countDown}s)</Text>
               </Text>
               <Text
                 style={{

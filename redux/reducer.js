@@ -30,3 +30,12 @@ export const orderReducer = createReducer({ isOrder: false,order:null }, (builde
       state.order = action.payload;
     })
 });
+
+
+export const carReducer = createReducer({ car:[]}, (builder) => {
+  builder
+    .addCase("addCar", (state, action) => {
+      state.car = action.payload;
+    })
+    
+});

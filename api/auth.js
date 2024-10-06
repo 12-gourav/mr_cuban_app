@@ -1,4 +1,5 @@
 import axios from "axios";
+import { ToastAndroid } from "react-native";
 
 let url = "https://mr-cuban-app-backend.onrender.com/api/v1";
 
@@ -31,6 +32,20 @@ export const RegisterApi = async (name, email, phone, password) => {
     });
   } catch (error) {
     console.log(error?.response?.data?.msg);
+    ToastAndroid.show(error?.response?.data?.msg, ToastAndroid.SHORT);
+
+  }
+};
+
+export const VerifyAPI = async (email, otp) => {
+  try {
+    return await axios.post(`${url}/verify/user`, {
+      email,
+      otp,
+    });
+  } catch (error) {
+    console.log(error?.response?.data?.msg);
+    ToastAndroid.show(error?.response?.data?.msg, ToastAndroid.SHORT);
   }
 };
 
