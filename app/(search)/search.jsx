@@ -38,7 +38,7 @@ const search = () => {
   const [rides, setRides] = useState([]);
   const [rideLoading, setRideLoading] = useState(false);
 
-  const [countDown,setCountDown] = useState(120);
+  const [countDown,setCountDown] = useState(60);
 
 
 
@@ -377,6 +377,8 @@ const search = () => {
                             modelNumber:item?.model?.modelNumber,
                             order_id: state?._id,
                             driver_id: item?.id,
+                            image:item?.model?.modelImage,
+                            km:item?.distance
                           },
                         })
                       }

@@ -20,7 +20,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { AcceptOrderAPI } from "../../api/order";
 import { StatusBar } from "expo-status-bar";
 
-
 const detail = () => {
   const {
     name,
@@ -38,6 +37,7 @@ const detail = () => {
     modelNumber,
     order_id,
     driver_id,
+    image,km
   } = useLocalSearchParams();
 
   const { user } = useSelector((state) => state.user);
@@ -53,7 +53,7 @@ const detail = () => {
         user?._id,
         user?._name
       );
-      console.log(driver_id)
+      console.log(driver_id);
       if (result?.data?.data) {
         ToastAndroid.show(
           "Your ride has been successfully booked. Thank you for choosing Mr. Cuban for your travel needs.",
@@ -61,7 +61,6 @@ const detail = () => {
         );
         dispatch({ type: "deleteOrder", payload: false });
         router.replace("/history");
-
       }
     } catch (error) {
       console.log(error);
@@ -69,8 +68,6 @@ const detail = () => {
       setLoading(false);
     }
   };
-
-  
 
   return (
     <ImageBackground
@@ -178,8 +175,38 @@ const detail = () => {
                 </View>
               </>
             )}
-            <AuthButton title={"Confirm Order"} loading={loading} handlePress={CreateOrder} />
-            <Text style={{ fontSize: 14, marginTop: 10, color: "#ccc",textAlign:"justify",lineHeight:20,marginBottom:20 }}>
+            <View style={styles.form}>
+              <Text style={styles.label}>One Way Distance (Aprox)</Text>
+              <Text style={styles.text1}>{km} KM</Text>
+            </View>
+            <View style={styles.form}>
+              <Text style={styles.label}>Car Images</Text>
+              <View style={styles.images}>
+                {image?.map((s) => (
+                  <Image
+                    resizeMode="cover"
+                    source={{ uri: s?.url }}
+                    key={s?.public_id}
+                    style={styles.img}
+                  />
+                ))}
+              </View>
+            </View>
+            <AuthButton
+              title={"Confirm Order"}
+              loading={loading}
+              handlePress={CreateOrder}
+            />
+            <Text
+              style={{
+                fontSize: 14,
+                marginTop: 10,
+                color: "#ccc",
+                textAlign: "justify",
+                lineHeight: 20,
+                marginBottom: 20,
+              }}
+            >
               Your ride is confirmed! Please share this OTP with the driver when
               they arrive to begin your ride: {user?.accountOtp}. For your
               safety, do not share the OTP until the driver is with you.
@@ -187,7 +214,6 @@ const detail = () => {
           </ScrollView>
         </View>
         <StatusBar backgroundColor="#000" style="light" />
-
       </SafeAreaView>
     </ImageBackground>
   );

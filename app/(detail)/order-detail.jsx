@@ -8,6 +8,7 @@ import {
   ToastAndroid,
   TouchableOpacity,
   View,
+  Image,
 } from "react-native";
 import React, { useState } from "react";
 import img from "../../assets/img/login.jpg";
@@ -67,7 +68,6 @@ const orderdetail = () => {
       { cancelable: false }
     );
   };
-
 
   return (
     <ImageBackground
@@ -189,9 +189,26 @@ const orderdetail = () => {
                   <Text style={styles.label}>Return Time</Text>
                   <Text style={styles.text1}>{order?.date2}</Text>
                 </View>
+               
               </>
             )}
-
+             <View style={styles.form}>
+                  <Text style={styles.label}>One Way Distance (Aprox)</Text>
+                  <Text style={styles.text1}>{order?.km} KM</Text>
+                </View>
+            <View style={styles.form}>
+              <Text style={styles.label}>Car Images</Text>
+              <View style={styles.images}>
+                {order?.driver[0]?.model?.modelImage?.map((s) => (
+                  <Image
+                    resizeMode="cover"
+                    source={{ uri: s?.url }}
+                    key={s?.public_id}
+                    style={styles.img}
+                  />
+                ))}
+              </View>
+            </View>
             {order?.status === "complete" ? (
               <AuthButton
                 title={"Give Feedback"}
@@ -334,5 +351,17 @@ const styles = StyleSheet.create({
     color: "#fff",
     marginTop: 20,
     marginLeft: 20,
+  },
+  images: {
+    width: "100%",
+    display: "flex",
+    flexDirection: "row",
+    gap: 10,
+  },
+  img: {
+    width: 100,
+    height: 100,
+    objectFit: "cover",
+    borderRadius: 5,
   },
 });

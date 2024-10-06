@@ -381,7 +381,7 @@ const home = () => {
                     renderItem={({ item }) => (
                       <TouchableOpacity
                         onPress={() => setTaxi(item.seat)}
-                        key={item?.model}
+                        key={item?.seat}
                       >
                         <View
                           style={
