@@ -361,12 +361,12 @@ const home = () => {
                 <View style={styles.slider}>
                   <FlatList
                     data={[1, 2, 3]}
-                    renderItem={({ item }) => (
-                      <View style={styles.card3} key={item}>
+                    renderItem={({ item,index }) => (
+                      <View style={styles.card3} key={index}>
                         <ActivityIndicator size={"small"} color={"#fff"} />
                       </View>
                     )}
-                    keyExtractor={(item) => item?.model}
+                    keyExtractor={(item, index) => index.toString()} // Use index as a fallback
                     horizontal={true}
                     showsHorizontalScrollIndicator={false}
                     ItemSeparatorComponent={() => (
@@ -378,10 +378,10 @@ const home = () => {
                 <View style={styles.slider}>
                   <FlatList
                     data={car}
-                    renderItem={({ item }) => (
+                    renderItem={({ item,index }) => (
                       <TouchableOpacity
                         onPress={() => setTaxi(item.seat)}
-                        key={item?.seat}
+                        key={index}
                       >
                         <View
                           style={
@@ -404,7 +404,7 @@ const home = () => {
                         </View>
                       </TouchableOpacity>
                     )}
-                    keyExtractor={(item) => item?.model}
+                    keyExtractor={(item, index) => index.toString()} // Use index as a fallback
                     horizontal={true}
                     showsHorizontalScrollIndicator={false}
                     ItemSeparatorComponent={() => (

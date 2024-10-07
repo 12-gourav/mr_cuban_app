@@ -2,7 +2,7 @@ import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { colors } from "../../assets/color";
-import img from "../../assets/img/offers.png";
+import img from "../../assets/img/r5.png";
 import { StatusBar } from "expo-status-bar";
 
 

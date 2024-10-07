@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import img from "../../assets/img/login.jpg";
 import { colors } from "../../assets/color";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -37,11 +37,13 @@ const detail = () => {
     modelNumber,
     order_id,
     driver_id,
-    image,km
+    image,
+    km
   } = useLocalSearchParams();
 
   const { user } = useSelector((state) => state.user);
   const [loading, setLoading] = useState(false);
+  const [images,setImages] = useState([])
   const dispatch = useDispatch();
 
   const CreateOrder = async () => {
@@ -53,7 +55,7 @@ const detail = () => {
         user?._id,
         user?._name
       );
-      console.log(driver_id);
+    
       if (result?.data?.data) {
         ToastAndroid.show(
           "Your ride has been successfully booked. Thank you for choosing Mr. Cuban for your travel needs.",
@@ -68,6 +70,17 @@ const detail = () => {
       setLoading(false);
     }
   };
+
+  console.log(JSON.parse(image))
+
+
+  useEffect(()=>{
+    if(image){
+      setImages(JSON.parse(image))
+    }
+  },[image])
+
+console.log(images,"kkk")
 
   return (
     <ImageBackground
@@ -182,7 +195,7 @@ const detail = () => {
             <View style={styles.form}>
               <Text style={styles.label}>Car Images</Text>
               <View style={styles.images}>
-                {image?.map((s) => (
+                {images?.map((s) => (
                   <Image
                     resizeMode="cover"
                     source={{ uri: s?.url }}
@@ -322,4 +335,16 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginLeft: 20,
   },
+  images:{
+    width:"100%",
+    display:"flex",
+    gap:10,
+    flexDirection:"row",
+    marginTop:10
+  },
+  img:{
+    width:100,
+    height:100,
+    borderRadius:5
+  }
 });

@@ -377,8 +377,8 @@ const search = () => {
                             modelNumber:item?.model?.modelNumber,
                             order_id: state?._id,
                             driver_id: item?.id,
-                            image:item?.model?.modelImage,
-                            km:item?.distance
+                            image:JSON.stringify(item?.model?.modelImage),
+                            km:state?.distance
                           },
                         })
                       }
