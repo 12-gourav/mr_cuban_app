@@ -429,7 +429,7 @@ const home = () => {
           testID="dateTimePicker"
           value={date}
           mode={mode}
-          is24Hour={true}
+          is24Hour={false}
           onChange={onChange}
         />
       )}
@@ -438,7 +438,7 @@ const home = () => {
           testID="dateTimePicker"
           value={dropDate}
           mode={mode2}
-          is24Hour={true}
+          is24Hour={false}
           onChange={onChange2}
         />
       )}

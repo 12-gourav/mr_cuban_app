@@ -1,6 +1,7 @@
 import axios from "axios";
 
 let url = "https://mr-cuban-app-backend.onrender.com/api/v1";
+// let url = "https://mrcuban-backend.onrender.com/api/v1"
 
 export const CreateOrder = async (
   pickup,
@@ -22,14 +23,14 @@ export const CreateOrder = async (
         pickup,
         drop,
         type,
-        returnPickup:drop,
-        returnDrop:pickup,
+        returnPickup: drop,
+        returnDrop: pickup,
         pickdate,
         dropdate,
         id,
         otp,
         seat: taxi,
-        km
+        km,
       },
       {
         headers: {
@@ -136,13 +137,13 @@ export const GetHistoryOrdersAPI = async (page, id) => {
   }
 };
 
-export const SendPushNotification = async (title, message,seat) => {
+export const SendPushNotification = async (title, message, seat) => {
   try {
     return await axios.get(`${url}/send/push/notification`, {
       params: {
         title,
         message,
-        seat
+        seat,
       },
     });
   } catch (error) {
@@ -182,16 +183,10 @@ export const GetCommentAPI = async (id) => {
   }
 };
 
-
-
-
 export const GetVicheles = async () => {
   try {
-  
     return await axios.get(`${url}/vichele`, {
-      params: {
-        
-      },
+      params: {},
     });
   } catch (error) {
     console.log(error?.response);

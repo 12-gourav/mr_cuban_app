@@ -168,7 +168,7 @@ console.log(images,"kkk")
             </View>
             <View style={styles.form}>
               <Text style={styles.label}>Pickup Time</Text>
-              <Text style={styles.text1}>{pickupDate}</Text>
+              <Text style={styles.text2}>{pickupDate}</Text>
             </View>
             {way === "Round Trip" && (
               <>
@@ -184,7 +184,7 @@ console.log(images,"kkk")
 
                 <View style={styles.form}>
                   <Text style={styles.label}>Return Time</Text>
-                  <Text style={styles.text1}>{dropDate}</Text>
+                  <Text style={styles.text2}>{dropDate}</Text>
                 </View>
               </>
             )}
@@ -329,6 +329,12 @@ const styles = StyleSheet.create({
   text1: {
     color: "#fff",
     fontSize: 16,
+    textTransform:"capitalize"
+  },
+  text2: {
+    color: "#fff",
+    fontSize: 16,
+    textTransform:"uppercase"
   },
   back: {
     color: "#fff",

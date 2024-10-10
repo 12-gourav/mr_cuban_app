@@ -38,9 +38,7 @@ const search = () => {
   const [rides, setRides] = useState([]);
   const [rideLoading, setRideLoading] = useState(false);
 
-  const [countDown,setCountDown] = useState(60);
-
-
+  const [countDown, setCountDown] = useState(60);
 
   const router = useRouter();
   const dispatch = useDispatch();
@@ -129,12 +127,7 @@ const search = () => {
     }
   };
 
- 
-   
-   
-   
-   
-   useEffect(() => {
+  useEffect(() => {
     let intervalId;
     let apiCallIntervalId;
 
@@ -143,7 +136,7 @@ const search = () => {
       intervalId = setInterval(() => {
         setCountDown((prev) => {
           if (prev === 0) {
-            clearInterval(intervalId); 
+            clearInterval(intervalId);
             return 0;
           }
           return prev - 1;
@@ -165,18 +158,11 @@ const search = () => {
     };
   }, [isOrder, countDown]); // Re-run effect when countdown or order changes
 
-
-
-
   useEffect(() => {
     if (isOrder) {
       SearchRides();
     }
   }, [isOrder]);
-
-
-
-
 
   return (
     <ImageBackground
@@ -253,7 +239,8 @@ const search = () => {
                           ellipsizeMode="tail"
                           style={styles.p}
                         >
-                          {state?.pickup_date + " " + state?.pickup_time}
+                          {state?.pickup_date?.split(",")[0]}{" "}
+                          {state?.pickup_date?.split(",")[1]}
                         </Text>
                       </View>
                     </View>
@@ -296,7 +283,8 @@ const search = () => {
                               ellipsizeMode="tail"
                               style={styles.p}
                             >
-                              {state?.return_date + " " + state?.return_time}
+                              {state?.return_date?.split(",")[0]}{" "}
+                              {state?.return_date?.split(",")[1]}
                             </Text>
                           </View>
                         </View>
@@ -316,7 +304,10 @@ const search = () => {
                   fontFamily: "regular",
                 }}
               >
-                List of Rides <Text style={{color:colors.primary,fontSize:20}}>({countDown}s)</Text>
+                List of Rides{" "}
+                <Text style={{ color: colors.primary, fontSize: 20 }}>
+                  ({countDown}s)
+                </Text>
               </Text>
               <Text
                 style={{
@@ -369,16 +360,15 @@ const search = () => {
                             way: state?.trip_type,
                             returnPickup: state?.return_pickup_address,
                             returnDrop: state?.return_drop_address,
-                            dropDate:
-                              state?.return_date + " | " + state?.return_time,
+                            dropDate:state?.return_date,
                             pickupDate:
-                              state?.pickup_date + " | " + state?.pickup_time,
+                              state?.pickup_date ,
                             modelName: item?.model?.model,
-                            modelNumber:item?.model?.modelNumber,
+                            modelNumber: item?.model?.modelNumber,
                             order_id: state?._id,
                             driver_id: item?.id,
-                            image:JSON.stringify(item?.model?.modelImage),
-                            km:state?.distance
+                            image: JSON.stringify(item?.model?.modelImage),
+                            km: state?.distance,
                           },
                         })
                       }
