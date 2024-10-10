@@ -38,7 +38,7 @@ const search = () => {
   const [rides, setRides] = useState([]);
   const [rideLoading, setRideLoading] = useState(false);
 
-  const [countDown, setCountDown] = useState(60);
+  
 
   const router = useRouter();
   const dispatch = useDispatch();
@@ -117,6 +117,7 @@ const search = () => {
     try {
       setRideLoading(true);
       const result = await GetRidesAPI(state?._id);
+      console.log("call")
       if (result?.data?.data) {
         setRides(result?.data?.data?.drivers);
       }
@@ -129,40 +130,29 @@ const search = () => {
 
   useEffect(() => {
     let intervalId;
-    let apiCallIntervalId;
-
-    // Start countdown timer when the component loads
+  
     if (isOrder) {
       intervalId = setInterval(() => {
-        setCountDown((prev) => {
-          if (prev === 0) {
-            clearInterval(intervalId);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000); // Countdown every second
-
-      // Once countdown reaches 0, start calling the API every 10 seconds
-      if (countDown === 0) {
-        apiCallIntervalId = setInterval(() => {
-          fetchRides();
-        }, 10000); // 10 seconds in milliseconds
-      }
+        fetchRides();
+      }, 10000);
     }
-
-    // Cleanup intervals when the component unmounts
+  
+    // Cleanup interval on unmount or when isOrder changes
     return () => {
-      clearInterval(intervalId);
-      clearInterval(apiCallIntervalId);
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
     };
-  }, [isOrder, countDown]); // Re-run effect when countdown or order changes
+  }, [isOrder]);
+  
 
   useEffect(() => {
     if (isOrder) {
       SearchRides();
     }
   }, [isOrder]);
+
+
 
   return (
     <ImageBackground
@@ -306,7 +296,7 @@ const search = () => {
               >
                 List of Rides{" "}
                 <Text style={{ color: colors.primary, fontSize: 20 }}>
-                  ({countDown}s)
+                  
                 </Text>
               </Text>
               <Text
@@ -360,9 +350,8 @@ const search = () => {
                             way: state?.trip_type,
                             returnPickup: state?.return_pickup_address,
                             returnDrop: state?.return_drop_address,
-                            dropDate:state?.return_date,
-                            pickupDate:
-                              state?.pickup_date ,
+                            dropDate: state?.return_date,
+                            pickupDate: state?.pickup_date,
                             modelName: item?.model?.model,
                             modelNumber: item?.model?.modelNumber,
                             order_id: state?._id,
