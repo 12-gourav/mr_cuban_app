@@ -40,6 +40,7 @@ const search = () => {
 
   
 
+
   const router = useRouter();
   const dispatch = useDispatch();
 
@@ -61,6 +62,12 @@ const search = () => {
       setLoading(false);
     }
   };
+  
+  
+  
+  
+  
+  
   const CancelOrder = async () => {
     try {
       setLoading2(true);
@@ -117,7 +124,7 @@ const search = () => {
     try {
       setRideLoading(true);
       const result = await GetRidesAPI(state?._id);
-      console.log("call")
+    
       if (result?.data?.data) {
         setRides(result?.data?.data?.drivers);
       }
@@ -131,7 +138,7 @@ const search = () => {
   useEffect(() => {
     let intervalId;
   
-    if (isOrder) {
+    if (isOrder&&state?._id) {
       intervalId = setInterval(() => {
         fetchRides();
       }, 10000);
@@ -143,7 +150,7 @@ const search = () => {
         clearInterval(intervalId);
       }
     };
-  }, [isOrder]);
+  }, [isOrder,state?._id]);
   
 
   useEffect(() => {
@@ -152,6 +159,7 @@ const search = () => {
     }
   }, [isOrder]);
 
+  
 
 
   return (

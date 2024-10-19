@@ -1,7 +1,9 @@
 import axios from "axios";
 
-let url = "https://mr-cuban-app-backend.onrender.com/api/v1";
-// let url = "https://mrcuban-backend.onrender.com/api/v1"
+//Dev Backend
+// let url = "https://mr-cuban-app-backend.onrender.com/api/v1";
+//Production Backend
+let url = "https://mrcuban-backend.onrender.com/api/v1"
 
 export const CreateOrder = async (
   pickup,
@@ -45,6 +47,7 @@ export const CreateOrder = async (
 
 export const SearchOrders = async (id, token) => {
   try {
+    console.log(id,"1")
     return await axios.get(`${url}/get/lead`, {
       params: {
         id: id,
@@ -99,6 +102,7 @@ export const AcceptOrderAPI = async (orderId, driverId, customerId, name) => {
 
 export const GetRidesAPI = async (id) => {
   try {
+    
     return await axios.get(`${url}/get/lead/drivers`, {
       params: {
         orderId: id,
