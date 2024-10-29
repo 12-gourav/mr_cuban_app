@@ -189,13 +189,12 @@ const orderdetail = () => {
                   <Text style={styles.label}>Return Time</Text>
                   <Text style={styles.text1}>{order?.date2}</Text>
                 </View>
-               
               </>
             )}
-             <View style={styles.form}>
-                  <Text style={styles.label}>One Way Distance (Aprox)</Text>
-                  <Text style={styles.text1}>{order?.km} KM</Text>
-                </View>
+            <View style={styles.form}>
+              <Text style={styles.label}>One Way Distance (Aprox)</Text>
+              <Text style={styles.text1}>{order?.km} KM</Text>
+            </View>
             <View style={styles.form}>
               <Text style={styles.label}>Car Images</Text>
               <View style={styles.images}>
@@ -209,6 +208,44 @@ const orderdetail = () => {
                 ))}
               </View>
             </View>
+
+            <View style={styles.list}>
+              <Text style={styles.list_head}>Additional Charges:</Text>
+              <View style={styles.item}>
+                <Text style={styles.title}>
+                  Toll Costs, Parking, Permits, and State Taxes:
+                </Text>
+                <Text style={styles.description}>
+                  Excluded from the ride fare.
+                </Text>
+              </View>
+              <View style={styles.item}>
+                <Text style={styles.title}>Extra Hours:</Text>
+                <Text style={styles.description}>
+                  ₹100 per hour for additional hours beyond the booking period.
+                </Text>
+              </View>
+              <View style={styles.item}>
+                <Text style={styles.title}>Extra Kilometers:</Text>
+                <Text style={styles.description}>
+                  ₹10 per kilometer for distance exceeding the booked limit.
+                </Text>
+              </View>
+              <View style={styles.item}>
+                <Text style={styles.title}>Night Allowance:</Text>
+                <Text style={styles.description}>
+                  ₹500 per night for rides between 11:00 PM and 6:00 AM.
+                </Text>
+              </View>
+              <View style={styles.item}>
+                <Text style={styles.title}>Additional Fare:</Text>
+                <Text style={styles.description}>
+                  May apply if the trip does not end within the designated
+                  region (Rest of India).
+                </Text>
+              </View>
+            </View>
+
             {order?.status === "complete" ? (
               <AuthButton
                 title={"Give Feedback"}
@@ -357,6 +394,7 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     gap: 10,
+    marginTop:5
   },
   img: {
     width: 100,
@@ -364,4 +402,28 @@ const styles = StyleSheet.create({
     objectFit: "cover",
     borderRadius: 5,
   },
+  list:{
+    marginTop:10,
+   
+  },
+  list_head:{
+    color:"#fff",
+    fontSize:16,
+    marginBottom:10
+  },
+  item:{
+    width:"100%",
+    display:"flex",
+    flexDirection:"column",
+    marginBottom:10
+  },
+  title:{
+    color:colors.primary,
+    fontSize:14
+  },
+  description:{
+    color:"#fff",
+    fontSize:13,
+    marginTop:3
+  }
 });

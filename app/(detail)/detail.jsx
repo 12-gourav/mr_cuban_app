@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import img from "../../assets/img/login.jpg";
 import { colors } from "../../assets/color";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -38,12 +38,12 @@ const detail = () => {
     order_id,
     driver_id,
     image,
-    km
+    km,
   } = useLocalSearchParams();
 
   const { user } = useSelector((state) => state.user);
   const [loading, setLoading] = useState(false);
-  const [images,setImages] = useState([])
+  const [images, setImages] = useState([]);
   const dispatch = useDispatch();
 
   const CreateOrder = async () => {
@@ -55,7 +55,7 @@ const detail = () => {
         user?._id,
         user?._name
       );
-    
+
       if (result?.data?.data) {
         ToastAndroid.show(
           "Your ride has been successfully booked. Thank you for choosing Mr. Cuban for your travel needs.",
@@ -71,16 +71,15 @@ const detail = () => {
     }
   };
 
-  console.log(JSON.parse(image))
+  console.log(JSON.parse(image));
 
-
-  useEffect(()=>{
-    if(image){
-      setImages(JSON.parse(image))
+  useEffect(() => {
+    if (image) {
+      setImages(JSON.parse(image));
     }
-  },[image])
+  }, [image]);
 
-console.log(images,"kkk")
+  console.log(images, "kkk");
 
   return (
     <ImageBackground
@@ -203,6 +202,42 @@ console.log(images,"kkk")
                     style={styles.img}
                   />
                 ))}
+              </View>
+            </View>
+            <View style={styles.list}>
+              <Text style={styles.list_head}>Additional Charges:</Text>
+              <View style={styles.item}>
+                <Text style={styles.title}>
+                  Toll Costs, Parking, Permits, and State Taxes:
+                </Text>
+                <Text style={styles.description}>
+                  Excluded from the ride fare.
+                </Text>
+              </View>
+              <View style={styles.item}>
+                <Text style={styles.title}>Extra Hours:</Text>
+                <Text style={styles.description}>
+                  ₹100 per hour for additional hours beyond the booking period.
+                </Text>
+              </View>
+              <View style={styles.item}>
+                <Text style={styles.title}>Extra Kilometers:</Text>
+                <Text style={styles.description}>
+                  ₹10 per kilometer for distance exceeding the booked limit.
+                </Text>
+              </View>
+              <View style={styles.item}>
+                <Text style={styles.title}>Night Allowance:</Text>
+                <Text style={styles.description}>
+                  ₹500 per night for rides between 11:00 PM and 6:00 AM.
+                </Text>
+              </View>
+              <View style={styles.item}>
+                <Text style={styles.title}>Additional Fare:</Text>
+                <Text style={styles.description}>
+                  May apply if the trip does not end within the designated
+                  region (Rest of India).
+                </Text>
               </View>
             </View>
             <AuthButton
@@ -329,28 +364,52 @@ const styles = StyleSheet.create({
   text1: {
     color: "#fff",
     fontSize: 16,
-    textTransform:"capitalize"
+    textTransform: "capitalize",
   },
   text2: {
     color: "#fff",
     fontSize: 16,
-    textTransform:"uppercase"
+    textTransform: "uppercase",
   },
   back: {
     color: "#fff",
     marginTop: 20,
     marginLeft: 20,
   },
-  images:{
+  images: {
+    width: "100%",
+    display: "flex",
+    gap: 10,
+    flexDirection: "row",
+    marginTop: 10,
+  },
+  img: {
+    width: 100,
+    height: 100,
+    borderRadius: 5,
+  },
+  list:{
+    marginTop:10,
+   
+  },
+  list_head:{
+    color:"#fff",
+    fontSize:16,
+    marginBottom:10
+  },
+  item:{
     width:"100%",
     display:"flex",
-    gap:10,
-    flexDirection:"row",
-    marginTop:10
+    flexDirection:"column",
+    marginBottom:10
   },
-  img:{
-    width:100,
-    height:100,
-    borderRadius:5
+  title:{
+    color:colors.primary,
+    fontSize:14
+  },
+  description:{
+    color:"#fff",
+    fontSize:13,
+    marginTop:3
   }
 });
