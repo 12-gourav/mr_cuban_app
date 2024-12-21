@@ -1,9 +1,9 @@
 import axios from "axios";
 
 //Dev Backend
-let url = "https://mr-cuban-app-backend.onrender.com/api/v1";
+// let url = "https://mr-cuban-app-backend.onrender.com/api/v1";
 //Production Backend
-// let url = "https://mrcuban-backend.onrender.com/api/v1"
+let url = "https://mrcuban-f7pa.onrender.com/api/v1"
 
 export const CreateOrder = async (
   pickup,
