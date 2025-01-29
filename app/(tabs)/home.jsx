@@ -10,6 +10,8 @@ import {
   ImageBackground,
   ToastAndroid,
   ActivityIndicator,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { colors } from "../../assets/color";
@@ -28,6 +30,9 @@ import {
 } from "../../api/order";
 import { StatusBar } from "expo-status-bar";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import AutocompleteText from "../../components/AutocompleteText";
+import { AddressSuggestions } from "../../api/here";
+import { debounce } from "lodash";
 
 const home = () => {
   const { user } = useSelector((state) => state.user);
@@ -51,6 +56,12 @@ const home = () => {
 
   const [viceles, setVicheles] = useState([]);
   const [vloading, setVloading] = useState(false);
+
+  const [pickupAutocomplete, setPickupAutocomplete] = useState(false);
+  const [pickupSuggestion, setPickupSuggestion] = useState([]);
+
+  const [dropAutocomplete, setDropAutocomplete] = useState(false);
+  const [dropSuggestion, setDropSuggestion] = useState([]);
 
   const dispatch = useDispatch();
 
@@ -165,6 +176,56 @@ const home = () => {
     }
   };
 
+
+  const handleOutsidePress = () => {
+    setPickupAutocomplete(false); 
+    setDropAutocomplete(false)
+    Keyboard.dismiss(); 
+  }
+
+  const debouncedGetAddressSuggestion = debounce(async () => {
+    try {
+      if(pickup==="") return
+      const result = await AddressSuggestions(pickup, "pickupAddress");
+      setPickupSuggestion([]);
+      if (result?.data?.items) {
+        setPickupSuggestion(result?.data?.items);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }, 3000);
+
+
+  const debouncedGetAddressSuggestion2 = debounce(async () => {
+    try {
+      if(drop==="") return
+      const result = await AddressSuggestions(drop, "dropAddress");
+      setDropSuggestion([]);
+      if (result?.data?.items) {
+        setDropSuggestion(result?.data?.items);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }, 3000);
+
+  useEffect(() => {
+    if (pickupAutocomplete) debouncedGetAddressSuggestion();
+
+    return () => {
+      debouncedGetAddressSuggestion.cancel();
+    };
+  }, [pickup, pickupAutocomplete]);
+
+  useEffect(() => {
+    if (dropAutocomplete) debouncedGetAddressSuggestion2();
+
+    return () => {
+      debouncedGetAddressSuggestion2.cancel();
+    };
+  }, [drop, dropAutocomplete]);
+
   useEffect(() => {
     if (car?.length === 0) fetcRides();
   }, [car]);
@@ -189,6 +250,7 @@ const home = () => {
     >
       <SafeAreaView style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.5)" }}>
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <TouchableWithoutFeedback onPress={handleOutsidePress}>
           <View style={styles.wrap}>
             <TouchableOpacity onPress={() => router.push("/")}>
               <Text style={styles.h2}>
@@ -297,17 +359,35 @@ const home = () => {
                 </View>
               )}
             </View>
+           
+              <View
+                style={styles.group}
+                onAccessibilityTap={() => setPickupAutocomplete(false)}
+              >
+                <Text style={styles.label}>Pickup Address</Text>
+                <TextInput
+                  value={pickup}
+                  style={styles.input}
+                  placeholder="Enter Pickup Address"
+                  placeholderTextColor={"gray"}
+                  onChangeText={(e) => setPickup(e)}
+                  onFocus={() => setPickupAutocomplete(true)}
+                />
+                {pickupAutocomplete && pickupSuggestion?.length > 0 && (
+                  <View style={styles.autocomplete}>
+                    {pickupSuggestion?.map((d1, i) => (
+                      <AutocompleteText
+                        key={d1?.address?.label + i}
+                        d={d1?.address?.label}
+                        setPickup={setPickup}
+                        setPickupAutocomplete={setPickupAutocomplete}
+                      />
+                    ))}
+                  </View>
+                )}
+              </View>
+         
 
-            <View style={styles.group}>
-              <Text style={styles.label}>Pickup Address</Text>
-              <TextInput
-                value={pickup}
-                style={styles.input}
-                placeholder="Enter Pickup Address"
-                placeholderTextColor={"gray"}
-                onChangeText={(e) => setPickup(e)}
-              />
-            </View>
             <View style={styles.group}>
               <Text style={styles.label}>Drop Address</Text>
               <TextInput
@@ -316,7 +396,20 @@ const home = () => {
                 placeholderTextColor={"gray"}
                 onChangeText={(e) => setDrop(e)}
                 value={drop}
+                onFocus={() => setDropAutocomplete(true)}
               />
+              {dropAutocomplete && dropSuggestion?.length > 0 && (
+                <View style={styles.autocomplete}>
+                  {dropSuggestion?.map((d1, i) => (
+                    <AutocompleteText
+                      key={d1?.address?.label + i}
+                      d={d1?.address?.label}
+                      setPickup={setDrop}
+                      setPickupAutocomplete={setDropAutocomplete}
+                    />
+                  ))}
+                </View>
+              )}
             </View>
 
             {/* {state === "Round Trip" && (
@@ -361,7 +454,7 @@ const home = () => {
                 <View style={styles.slider}>
                   <FlatList
                     data={[1, 2, 3]}
-                    renderItem={({ item,index }) => (
+                    renderItem={({ item, index }) => (
                       <View style={styles.card3} key={index}>
                         <ActivityIndicator size={"small"} color={"#fff"} />
                       </View>
@@ -378,7 +471,7 @@ const home = () => {
                 <View style={styles.slider}>
                   <FlatList
                     data={car}
-                    renderItem={({ item,index }) => (
+                    renderItem={({ item, index }) => (
                       <TouchableOpacity
                         onPress={() => setTaxi(item.seat)}
                         key={index}
@@ -421,6 +514,7 @@ const home = () => {
               handlePress={() => handleRide()}
             />
           </View>
+          </TouchableWithoutFeedback>
           <StatusBar backgroundColor="#000" style="light" />
         </ScrollView>
       </SafeAreaView>
