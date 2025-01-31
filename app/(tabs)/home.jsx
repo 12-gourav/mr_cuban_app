@@ -17,7 +17,6 @@ import React, { useEffect, useState } from "react";
 import { colors } from "../../assets/color";
 import img from "../../assets/img/car3.png";
 import img2 from "../../assets/img/login.jpg";
-import { car } from "../../constants/Car";
 import AuthButton from "../../components/AuthButton";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -194,7 +193,7 @@ const home = () => {
     } catch (error) {
       console.log(error);
     }
-  }, 3000);
+  }, 2000);
 
 
   const debouncedGetAddressSuggestion2 = debounce(async () => {
@@ -208,7 +207,7 @@ const home = () => {
     } catch (error) {
       console.log(error);
     }
-  }, 3000);
+  }, 2000);
 
   useEffect(() => {
     if (pickupAutocomplete) debouncedGetAddressSuggestion();
