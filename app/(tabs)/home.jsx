@@ -32,6 +32,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import AutocompleteText from "../../components/AutocompleteText";
 import { AddressSuggestions } from "../../api/here";
 import { debounce } from "lodash";
+import { vicheles } from "../../constants/Car";
 
 const home = () => {
   const { user } = useSelector((state) => state.user);
@@ -174,7 +175,6 @@ const home = () => {
       setVloading(false);
     }
   };
-
 
   const handleOutsidePress = () => {
     setPickupAutocomplete(false); 
@@ -481,9 +481,9 @@ const home = () => {
                           }
                         >
                           <Image
-                            style={{ width: 100, marginBottom: 5 }}
+                            style={{ width: 100,height:70,marginBottom:5}}
                             resizeMode="contain"
-                            source={img}
+                            source={vicheles?.find((f)=>f?.name===item?.type)?.img||""}
                           />
                           <Text
                             style={
@@ -491,7 +491,7 @@ const home = () => {
                             }
                           >
                             {" "}
-                            {item?.seat} Seater
+                            {item?.name} 
                           </Text>
                         </View>
                       </TouchableOpacity>
