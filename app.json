@@ -25,7 +25,7 @@
         "icon": "./assets/icon.png",
         "color": "#FF231F7C"
       },
-      "package": "com.gourav_bajpai1212.mrcuban"
+      "package": "com.gourav_bajpaizxcv.mrcuban"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -39,7 +39,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "fc9e2bc0-8eb2-4751-8931-eedb9e5afc84"
+        "projectId": "f41f0d73-3602-48f7-912a-f60d59cabe7e"
       }
     }
   }
